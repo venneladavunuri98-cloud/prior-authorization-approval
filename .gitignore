@@ -1,0 +1,18 @@
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+# Raw, unsanitized n8n exports
+raw/
+*.crdownload
+# Real data and recordings (sample/ files are fake and allowed)
+*.mp3
+*.wav
+*.docx
+*.xlsx
+*.csv
+!sample/*.csv
+.DS_Store
