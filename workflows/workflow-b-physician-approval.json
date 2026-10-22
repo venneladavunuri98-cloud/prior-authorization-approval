@@ -1,0 +1,1100 @@
+{
+  "name": "Prior Authorization – Physician Approval & Payer Submission",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "reject/:requestId",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -4480,
+        1280
+      ],
+      "id": "b7daa085-f83e-4f74-bcaa-5493c9c792af",
+      "name": "Entry C - Reject Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "return { json: { requestId: $input.first().json.params.requestId } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4240,
+        1280
+      ],
+      "id": "a22410fb-b332-4ca5-84a0-69bc6fb26216",
+      "name": "Extract requestId (Reject)"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "prior_auth_requests",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "request_id",
+              "fieldValue": "={{ $json.requestId }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "manual_review_needed"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4000,
+        1280
+      ],
+      "id": "9af06e94-c86b-4e0f-a02e-510861610154",
+      "name": "Mark for Manual Review",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "supabaseApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=Request {{ $json.requestId }} was routed to manual staff review and will NOT be submitted automatically to the payer.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -3760,
+        1280
+      ],
+      "id": "1a576fc7-297f-4ed1-8261-143f89866d86",
+      "name": "Respond - Rejected Confirmation"
+    },
+    {
+      "parameters": {
+        "path": "approve/:requestId",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -8560,
+        304
+      ],
+      "id": "8327f7db-3d03-4ac7-b07d-402307d23913",
+      "name": "Entry B - Approve Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "const requestId = $input.first().json.params.requestId;\nreturn { json: { requestId } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8320,
+        304
+      ],
+      "id": "f2105570-db2d-47ac-ae6a-be81aceff501",
+      "name": "Extract requestId (Approve)"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "physician_approvals",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "request_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.requestId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -8128,
+        304
+      ],
+      "id": "b7dd8ac3-e618-4af3-aa25-e9f6982f3ff0",
+      "name": "Get Physician Approval Record",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "supabaseApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const requestId = $('Extract requestId (Approve)').first().json.requestId;\nconst rows = $input.all().map(i => i.json);\nconst row = rows[0];\n\nif (!row) {\n  return { json: { valid: false, requestId, reason: 'No approval record found for this request. Workflow A must create a physician_approvals row (decision=NULL, expires_at=now()+24h) when it sends the review email.' } };\n}\n\nconst notExpired = row.expires_at && new Date(row.expires_at) > new Date();\nconst notDecided = row.decision === null || row.decision === undefined || row.decision === '';\n\nreturn {\n  json: {\n    valid: Boolean(notExpired && notDecided),\n    requestId,\n    approval_id: row.approval_id,\n    reason: !notExpired ? 'expired' : (!notDecided ? 'already_decided' : 'ok')\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -7888,
+        304
+      ],
+      "id": "54db960a-52b2-4d61-aa81-a0f67e37e9f8",
+      "name": "Evaluate Approval Validity"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b1c2d3e4-0000-0000-0000-000000000001",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -7648,
+        304
+      ],
+      "id": "d1c2340e-412f-48dd-baf0-1d4ee11b80eb",
+      "name": "Check Approval Valid"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=This approval link has expired or has already been used ({{ $json.reason }}). Request {{ $json.requestId }}. Please contact the practice for further action.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -7408,
+        432
+      ],
+      "id": "af253e63-a722-4202-8240-70cd60ccca1b",
+      "name": "Respond - Link Expired"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "physician_approvals",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "request_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.requestId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "decision",
+              "fieldValue": "approved"
+            },
+            {
+              "fieldId": "decided_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -7408,
+        208
+      ],
+      "id": "c3a3943c-acbb-411b-aafd-03b6fbd9a727",
+      "name": "Mark Approval Decided",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "supabaseApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "prior_auth_requests",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "request_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.requestId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -7168,
+        128
+      ],
+      "id": "dfca370b-4d89-4188-8eba-dd3d052551d3",
+      "name": "Get Stored Auth Record",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "supabaseApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $vars.SUPABASE_URL }}/rest/v1/rpc/decrypt_patient_phi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "={{ $vars.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $vars.SUPABASE_SERVICE_KEY }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ req_id: $json.request_id }) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6928,
+        128
+      ],
+      "id": "4ae2325d-00d4-4372-af48-be9c57828bd1",
+      "name": "Decrypt Patient PHI (RPC)"
+    },
+    {
+      "parameters": {
+        "jsCode": "const record = $('Get Stored Auth Record').first().json;\nconst decrypted = $input.first().json;\n\nif (!record || !record.request_id) {\n  return { json: { error: true, message: 'No stored record found for this request' } };\n}\n\nconst phi = Array.isArray(decrypted) ? (decrypted[0] || {}) : (decrypted || {});\nconst extraction = record.clinical_extraction || {};\n\nconst payload = {\n  requestId: record.request_id,\n  requesting_physician_name: record.requesting_physician_name || '',\n  patient_id: record.patient_id,\n  encounter_id: record.encounter_id,\n  procedure_code: record.procedure_code,\n  diagnosis_code: record.diagnosis_codes || [],\n  physician_npi: record.physician_npi,\n  payer_id: record.payer_id,\n  coverage: {\n    payerName: record.payer_name,\n    memberId: record.payer_member_id || null\n  },\n  patient: {\n    name: phi.patient_name || '',\n    raw: { birthDate: phi.patient_dob || '' }\n  },\n  ai_extraction: {\n    urgency_level: record.urgency_level || 'routine',\n    procedure_requested: extraction.procedure_requested || record.procedure_code,\n    medical_necessity_statement: extraction.medical_necessity_statement || '',\n    clinical_justification: extraction.clinical_justification || '',\n    supporting_evidence: extraction.supporting_evidence || [],\n    alternative_treatments_tried: extraction.alternative_treatments_tried || []\n  }\n};\n\nreturn { json: { ...payload, approvedByPhysicianAt: new Date().toISOString() } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -6688,
+        128
+      ],
+      "id": "dda5d149-8dc8-4e8d-ad3d-bfb883e90fd7",
+      "name": "Reconstruct Auth Payload"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=Thanks, Dr. {{ $json.requesting_physician_name || '' }}. Request {{ $json.requestId }} is approved and is now being submitted to the payer.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -6448,
+        48
+      ],
+      "id": "27bda4aa-f64b-40b4-b7dd-2a3d496486a7",
+      "name": "Respond - Approved Confirmation"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.availity.com/availity/v1/token",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_id",
+              "value": "={{ $vars.AVAILITY_CLIENT_ID }}"
+            },
+            {
+              "name": "client_secret",
+              "value": "={{ $vars.AVAILITY_CLIENT_SECRET }}"
+            },
+            {
+              "name": "scope",
+              "value": "hipaa"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6208,
+        -48
+      ],
+      "id": "d8e67850-3436-4f36-ae61-20075e7b9bc1",
+      "name": "Availity - Get OAuth Token"
+    },
+    {
+      "parameters": {
+        "jsCode": "let authPayload;\ntry { authPayload = $('Entry A - Called From Workflow A').first().json; } catch (e) {}\nif (!authPayload) { try { authPayload = $('Reconstruct Auth Payload').first().json; } catch (e) {} }\nif (!authPayload) { authPayload = $input.first().json; }\n\nconst token = $input.first().json.access_token;\n\nreturn { json: { ...authPayload, availity_access_token: token } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5968,
+        -48
+      ],
+      "id": "4a9b8373-d347-4c1d-b0d8-b7aa9d0c4dab",
+      "name": "Attach Token to Payload"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.availity.com/availity/v1/eligibility-inquiries",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.availity_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  serviceTypeCode: '30',\n  payerId: $json.payer_id,\n  memberId: $json.coverage?.memberId,\n  dateOfBirth: $json.patient?.raw?.birthDate,\n  lastName: ($json.patient?.name || '').split(' ').slice(-1)[0],\n  firstName: ($json.patient?.name || '').split(' ')[0],\n  npi: $json.physician_npi,\n  serviceDate: new Date().toISOString().slice(0,10)\n}) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5728,
+        -48
+      ],
+      "id": "01f04471-1337-47fb-b3f8-fddd823cc9c1",
+      "name": "Availity - Eligibility Inquiry"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "361b17e9-3fb7-4415-876b-2f8bbbb16a98",
+              "leftValue": "={{ $json.benefitInformation?.[0]?.coverageStatus }}",
+              "rightValue": "1",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5488,
+        -48
+      ],
+      "id": "9178d24a-47eb-4fd2-82f4-3abe5455234e",
+      "name": "Is Patient Eligible?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "prior_auth_requests",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "request_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Attach Token to Payload').item.json.requestId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "ineligible"
+            },
+            {
+              "fieldId": "is_approved",
+              "fieldValue": "false"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -5248,
+        80
+      ],
+      "id": "834232d4-e7c2-4422-ad3e-a1068dd6afd6",
+      "name": "Log - Ineligible",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "supabaseApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $vars.BILLING_STAFF_EMAIL }}",
+        "subject": "=Prior Auth Stopped — Patient Not Eligible — {{ $('Attach Token to Payload').item.json.requestId }}",
+        "emailType": "text",
+        "message": "=ELIGIBILITY CHECK FAILED — AUTH NOT SUBMITTED\n\nRequest ID: {{ $('Attach Token to Payload').item.json.requestId }}\nPatient: {{ $('Attach Token to Payload').item.json.patient?.name }}\nPayer: {{ $('Attach Token to Payload').item.json.coverage?.payerName }}\n\nAvaility reports this member's coverage is not active. Submitting anyway would waste a payer slot and count against the denial rate. Please verify coverage manually before resubmitting.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -5008,
+        80
+      ],
+      "id": "8f1a4ffc-ee92-4201-a45e-e7814e82c26b",
+      "name": "Alert - Ineligible",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.availity.com/availity/v1/prior-auth-requests",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Attach Token to Payload').item.json.availity_access_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  payerId: $('Attach Token to Payload').item.json.payer_id,\n  requestingProvider: { npi: $('Attach Token to Payload').item.json.physician_npi },\n  patient: {\n    memberId: $('Attach Token to Payload').item.json.coverage?.memberId,\n    dateOfBirth: $('Attach Token to Payload').item.json.patient?.raw?.birthDate\n  },\n  serviceRequest: {\n    procedureCodes: [$('Attach Token to Payload').item.json.procedure_code],\n    diagnosisCodes: $('Attach Token to Payload').item.json.diagnosis_code,\n    urgencyCode: ({routine:'R', urgent:'U', emergent:'E'})[$('Attach Token to Payload').item.json.ai_extraction?.urgency_level] || 'R'\n  },\n  clinicalInfo: {\n    medicalNecessityStatement: $('Attach Token to Payload').item.json.ai_extraction?.medical_necessity_statement,\n    clinicalNotes: $('Attach Token to Payload').item.json.ai_extraction?.clinical_justification\n  }\n}) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5248,
+        -176
+      ],
+      "id": "a2e48543-ff3b-484f-9f0b-a0931355256a",
+      "name": "Availity - Submit Prior Authorization"
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "output": "={{ ['approved','A1','certified'].includes($json.status) ? 0 : ['denied','not_certified','rejected'].includes($json.status) ? 1 : 2 }}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -5008,
+        -176
+      ],
+      "id": "e15d1c54-5f97-4fbb-b3dc-cb5a0a81416c",
+      "name": "Route by Availity Status"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "prior_auth_requests",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "request_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Attach Token to Payload').item.json.requestId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "approved"
+            },
+            {
+              "fieldId": "auth_number",
+              "fieldValue": "={{ $json.authorizationNumber }}"
+            },
+            {
+              "fieldId": "is_approved",
+              "fieldValue": "true"
+            },
+            {
+              "fieldId": "tracking_id",
+              "fieldValue": "={{ $json.trackingId }}"
+            },
+            {
+              "fieldId": "submitted_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4768,
+        -368
+      ],
+      "id": "9616a34e-de4e-45f7-a343-32ce52f3cc5e",
+      "name": "Log - Approved",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "supabaseApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $vars.CARE_TEAM_EMAIL }}",
+        "subject": "=Prior Auth Approved — {{ $('Attach Token to Payload').item.json.requestId }}",
+        "emailType": "text",
+        "message": "=PRIOR AUTHORIZATION APPROVED\n\nRequest ID: {{ $('Attach Token to Payload').item.json.requestId }}\nPatient: {{ $('Attach Token to Payload').item.json.patient?.name }}\nProcedure: {{ $('Attach Token to Payload').item.json.ai_extraction?.procedure_requested }}\nAuthorization Number: {{ $json.authorizationNumber }}\n\nThe procedure may be scheduled.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4528,
+        -368
+      ],
+      "id": "6553cebc-541c-41b8-86de-a8a05604aef2",
+      "name": "Alert - Approved",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: 'gpt-4o',\n  messages: [\n    { role: 'system', content: \"You are a healthcare appeals specialist. Write a formal prior authorization appeal letter. Reference the specific payer denial reason, cite the clinical evidence from the original note, reference applicable clinical guidelines where relevant (AMA, specialty society, payer LCD), and structure the letter as: Header, Clinical Summary, Medical Necessity Argument, Supporting Evidence, Request for Reconsideration. Return plain text only, no markdown, no JSON.\" },\n    { role: 'user', content: 'Denial reason: ' + ($json.denialReason || 'not specified') +\n      '\\nPayer: ' + ($('Attach Token to Payload').item.json.coverage?.payerName || '') +\n      '\\nProcedure CPT: ' + $('Attach Token to Payload').item.json.procedure_code +\n      '\\nDiagnosis ICD-10: ' + $('Attach Token to Payload').item.json.diagnosis_code.join(', ') +\n      '\\nPhysician NPI: ' + $('Attach Token to Payload').item.json.physician_npi +\n      '\\nClinical justification: ' + ($('Attach Token to Payload').item.json.ai_extraction?.clinical_justification || '') +\n      '\\nSupporting evidence: ' + ($('Attach Token to Payload').item.json.ai_extraction?.supporting_evidence || []).join('; ') +\n      '\\nAlternative treatments tried: ' + ($('Attach Token to Payload').item.json.ai_extraction?.alternative_treatments_tried || []).join('; ')\n    }\n  ]\n}) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4768,
+        -176
+      ],
+      "id": "d5fdb68e-de73-42d1-8f26-ec7d9d48dd83",
+      "name": "OpenAI - Generate Appeal Letter",
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "openAiApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const claim = $input.first().json;\nconst letter = claim.choices?.[0]?.message?.content || \"Appeal letter generation failed \\u2014 draft manually.\";\nreturn { json: { appeal_letter: letter } };"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4528,
+        -176
+      ],
+      "id": "7538c481-b4e6-42a4-891f-bc4337a4abd4",
+      "name": "Extract Appeal Letter Text"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "prior_auth_requests",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "request_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Attach Token to Payload').item.json.requestId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "denied"
+            },
+            {
+              "fieldId": "is_approved",
+              "fieldValue": "false"
+            },
+            {
+              "fieldId": "denial_reason",
+              "fieldValue": "={{ $('Availity - Submit Prior Authorization').item.json.denialReason }}"
+            },
+            {
+              "fieldId": "submitted_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4288,
+        -176
+      ],
+      "id": "a6d2aabc-0dbc-4070-bdef-275eba0d4e0d",
+      "name": "Log - Denied",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "supabaseApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $vars.PHYSICIAN_EMAIL }}",
+        "subject": "=Prior Auth Denied — Appeal Draft Ready — {{ $('Attach Token to Payload').item.json.requestId }}",
+        "emailType": "text",
+        "message": "=PRIOR AUTH DENIED — APPEAL LETTER DRAFTED FOR YOUR REVIEW\n\nRequest ID: {{ $('Attach Token to Payload').item.json.requestId }}\nPatient: {{ $('Attach Token to Payload').item.json.patient?.name }}\nDenial Reason: {{ $('Availity - Submit Prior Authorization').item.json.denialReason }}\n\n--- DRAFT APPEAL LETTER ---\n\n{{ $json.appeal_letter }}\n\n--- END DRAFT ---\n\nPlease review, edit as needed, and submit through your standard appeals channel.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -4048,
+        -176
+      ],
+      "id": "ca5f7d8d-7d86-40c0-ad0a-0013a4b23df5",
+      "name": "Alert - Denied With Appeal Draft",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "prior_auth_requests",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "request_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Attach Token to Payload').item.json.requestId }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "pending"
+            },
+            {
+              "fieldId": "tracking_id",
+              "fieldValue": "={{ $json.trackingId }}"
+            },
+            {
+              "fieldId": "submitted_at",
+              "fieldValue": "={{ new Date().toISOString() }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -4768,
+        0
+      ],
+      "id": "9c0bfba5-f379-4706-b29e-b9f04ffb59e8",
+      "name": "Log - Pending",
+      "credentials": {
+        "supabaseApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "supabaseApi (configure in n8n)"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Entry C - Reject Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract requestId (Reject)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract requestId (Reject)": {
+      "main": [
+        [
+          {
+            "node": "Mark for Manual Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark for Manual Review": {
+      "main": [
+        [
+          {
+            "node": "Respond - Rejected Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Entry B - Approve Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract requestId (Approve)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract requestId (Approve)": {
+      "main": [
+        [
+          {
+            "node": "Get Physician Approval Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Physician Approval Record": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Approval Validity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Approval Validity": {
+      "main": [
+        [
+          {
+            "node": "Check Approval Valid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Approval Valid": {
+      "main": [
+        [
+          {
+            "node": "Mark Approval Decided",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond - Link Expired",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Approval Decided": {
+      "main": [
+        [
+          {
+            "node": "Get Stored Auth Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Stored Auth Record": {
+      "main": [
+        [
+          {
+            "node": "Decrypt Patient PHI (RPC)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decrypt Patient PHI (RPC)": {
+      "main": [
+        [
+          {
+            "node": "Reconstruct Auth Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconstruct Auth Payload": {
+      "main": [
+        [
+          {
+            "node": "Respond - Approved Confirmation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond - Approved Confirmation": {
+      "main": [
+        [
+          {
+            "node": "Availity - Get OAuth Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Availity - Get OAuth Token": {
+      "main": [
+        [
+          {
+            "node": "Attach Token to Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Attach Token to Payload": {
+      "main": [
+        [
+          {
+            "node": "Availity - Eligibility Inquiry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Availity - Eligibility Inquiry": {
+      "main": [
+        [
+          {
+            "node": "Is Patient Eligible?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Patient Eligible?": {
+      "main": [
+        [
+          {
+            "node": "Availity - Submit Prior Authorization",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log - Ineligible",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log - Ineligible": {
+      "main": [
+        [
+          {
+            "node": "Alert - Ineligible",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Availity - Submit Prior Authorization": {
+      "main": [
+        [
+          {
+            "node": "Route by Availity Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Availity Status": {
+      "main": [
+        [
+          {
+            "node": "Log - Approved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI - Generate Appeal Letter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log - Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log - Approved": {
+      "main": [
+        [
+          {
+            "node": "Alert - Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Generate Appeal Letter": {
+      "main": [
+        [
+          {
+            "node": "Extract Appeal Letter Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Appeal Letter Text": {
+      "main": [
+        [
+          {
+            "node": "Log - Denied",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log - Denied": {
+      "main": [
+        [
+          {
+            "node": "Alert - Denied With Appeal Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}
