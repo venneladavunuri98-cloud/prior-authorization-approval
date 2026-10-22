@@ -1,0 +1,15 @@
+{
+  "_note": "Entirely fictional test data. Never use real patient data.",
+  "request_id": "11111111-2222-3333-4444-555555555555",
+  "status": "awaiting_physician",
+  "requesting_physician_name": "Dr. Test Physician",
+  "patient_id": "TEST-PATIENT-001",
+  "procedure_code": "72148",
+  "diagnosis_codes": ["M54.16"],
+  "physician_npi": "0000000000",
+  "payer_id": "TEST-PAYER",
+  "payer_name": "Sandbox Health Plan",
+  "payer_member_id": "TEST-MEMBER-001",
+  "urgency_level": "routine",
+  "clinical_extraction": "Fictional: 8 weeks of lumbar radicular pain unresponsive to physical therapy and NSAIDs."
+}
