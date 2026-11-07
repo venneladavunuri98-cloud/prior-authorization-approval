@@ -1,0 +1,2852 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Submission Error\nSaves the error text (first 500 chars) and flags for manual submission.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "232f88b8-7fba-460c-ab43-183f5d59cda2",
+      "name": "Note - Supabase - Log Submission Error",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20044,
+        -961
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Pending\nSaves the tracking ID and sets **next_check_at = now + 6 h**. The *Pending Status Poller* workflow picks it up from there.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "a3e7c9f6-65b9-4d85-bc80-6b01b51e23d8",
+      "name": "Note - Supabase - Log Pending",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20044,
+        -1422
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Denied\nSaves denial code + reason and flags for manual review (appeal letter to be sent).",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "158f2eda-1a8d-45b2-963c-8b95fea14102",
+      "name": "Note - Supabase - Log Denied",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -19708,
+        -1844
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Approved\nSaves auth number, valid-from/to dates and submitted time. `is_approved = true`.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "78b2dc41-a0ef-453f-84cb-4a82400be848",
+      "name": "Note - Supabase - Log Approved",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20044,
+        -2267
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Eligibility Failed\nInactive coverage or payer error. Saves the result and number of polls, flags for manual review.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "1ea9d1b9-fa4c-4077-934a-412f477e8288",
+      "name": "Note - Supabase - Log Eligibility Failed",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -21724,
+        -385
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Not Submitted\nPhysician rejected or didn't answer in 24 h. Status `physician_rejected` / `physician_no_response` and **needs_manual_review = true** (the guide's manual review record).",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "cee649a9-6752-4cb4-811f-87f2ab5bc71b",
+      "name": "Note - Supabase - Log Not Submitted",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -23404,
+        -1422
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Validation Rejected\nSaves the rejected request to Supabase with the list of missing / invalid fields and flags it for manual review. No patient name is stored here.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "fc1aa90d-1684-48f8-ae6b-88d0a8cf1ef7",
+      "name": "Note - Supabase - Log Validation Rejected",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -27772,
+        -577
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Physician Approved\nRecords the physician's approval (actor = physician), then continues to the eligibility check.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "bec0e0ad-cd62-4557-bc13-7f0c32b15168",
+      "name": "Note - Supabase - Log Physician Approved",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -23404,
+        -1806
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Review Requested\nStatus → `awaiting_physician` with the review reason, just before the approval email goes out.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "830f2765-f49c-407b-a926-c622070cb178",
+      "name": "Note - Supabase - Log Review Requested",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -25084,
+        -1806
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ Log: Case Created\nCreates the request row: codes, payer, urgency, review decision. Patient **name + DOB are encrypted** inside Supabase (pgcrypto). Runs in line, so the row exists before anything else happens.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "964baa53-e4b7-44f9-9a59-320b7a23f61b",
+      "name": "Note - Supabase - Log Case Created",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -25756,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑥ Epic – Sign JWT\nBuilds a signed JWT (iss/sub = client ID, aud = token URL, unique jti, 4-min expiry) with private key `kid saids-prior-auth-key-2`. This is Epic's backend-services (SMART) auth.",
+        "height": 250,
+        "width": 300,
+        "color": 5
+      },
+      "id": "a844f543-0b00-43f3-978f-95dcb569a6f3",
+      "name": "Note - Epic - Sign JWT",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -28108,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑦ Epic – Access Token\nSends the JWT as a `client_assertion` (client_credentials grant) to Epic's token URL and gets a short-lived **Bearer access_token** used by the 4 FHIR calls.",
+        "height": 250,
+        "width": 300,
+        "color": 5
+      },
+      "id": "1a20c17b-6069-41db-ab19-1bc8a092396b",
+      "name": "Note - Epic - Get Access Token",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -27772,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ① Webhook – Intake\nEntry point. Receives a **POST** at `/prior-auth-request` with patient_id, encounter_id, procedure (CPT), diagnosis codes (ICD-10), payer, NPI and an optional clinical note.",
+        "height": 250,
+        "width": 300,
+        "color": 1
+      },
+      "id": "60040f6c-8a65-4fb5-a545-3291115e3fea",
+      "name": "Note - Webhook - Prior Auth Request1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -29452,
+        -1000
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ④ Validate Fields\nGate: patient, encounter, procedure, diagnoses and payer must be present and NPI must be exactly 10 digits.\n✅ true → Epic login\n❌ false → rejection email",
+        "height": 250,
+        "width": 300,
+        "color": 1
+      },
+      "id": "141e24af-bcc4-4279-99f9-b4e5732ea5e8",
+      "name": "Note - IF - Validate Required Fields1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -28444,
+        -1000
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ② Config\nAll settings in one place: Epic & Availity URLs, client ID, ORG_NPI, emails, `AVAILITY_PA_MODE` (mock/live).\n**Phase 6:** `SUPABASE_URL` and `PENDING_POLL_HOURS` (6).",
+        "height": 250,
+        "width": 300,
+        "color": 7
+      },
+      "id": "c9fa1144-99ff-4c8e-8c1d-84877d8e37d1",
+      "name": "Note - Config1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -29116,
+        -1000
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ③ Normalize Request\nCleans the webhook body (trim, upper-case codes, diagnosis list).\n**Phase 6:** also creates the `requestId` here, so the rejection log and every later step share one ID.",
+        "height": 250,
+        "width": 300,
+        "color": 1
+      },
+      "id": "47a71f58-bc07-4694-ae7b-b8838b859516",
+      "name": "Note - Code - Normalize Request1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -28780,
+        -1000
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑤ Rejection Email\nTells billing staff the request was refused and lists each field as OK / MISSING so they can fix and resubmit. Flow ends here.",
+        "height": 250,
+        "width": 300,
+        "color": 3
+      },
+      "id": "df55ad4a-50e9-4b8d-8b86-2976b731ac2d",
+      "name": "Note - Gmail - Rejection Email1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -28108,
+        -577
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑧ FHIR Patient\n`GET /Patient/{id}` → name, birth date, gender. Needed for the payer eligibility check and PA request.",
+        "height": 250,
+        "width": 300,
+        "color": 5
+      },
+      "id": "ccbb03e8-ff35-4e36-9801-fab41cb0ba44",
+      "name": "Note - Epic FHIR - Get Patient1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -27436,
+        -1844
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑨ FHIR Encounter\n`GET /Encounter/{id}` → visit status, type and dates. Confirms the encounter exists.",
+        "height": 250,
+        "width": 300,
+        "color": 5
+      },
+      "id": "290dab6f-407b-46d5-b61e-29fe9993ee19",
+      "name": "Note - Epic FHIR - Get Encounter1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -27436,
+        -1460
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑩ FHIR Clinical Notes\n`GET /DocumentReference?patient=…&type=11506-3` (LOINC progress note). The note text is the evidence the AI uses for medical necessity.",
+        "height": 250,
+        "width": 300,
+        "color": 5
+      },
+      "id": "7caa9fae-9482-4eb3-88d3-bb6c60727afb",
+      "name": "Note - Epic FHIR - Get Clinical Notes1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -27436,
+        -1076
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑪ FHIR Coverage\n`GET /Coverage?patient=…&status=active` → member ID, group number, payer name from the patient's insurance on file.",
+        "height": 250,
+        "width": 300,
+        "color": 5
+      },
+      "id": "41e01e67-e894-4072-822e-d10c969df6fe",
+      "name": "Note - Epic FHIR - Get Coverage1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -27436,
+        -692
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑫ Merge\nWaits for all **4** parallel FHIR calls to finish before continuing, so the next step has everything at once.",
+        "height": 250,
+        "width": 300,
+        "color": 5
+      },
+      "id": "f3a508ec-14d5-48c8-8e48-01ed6b3b5320",
+      "name": "Note - Merge - FHIR Responses1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -27100,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑬ Build Case File\nCombines request + FHIR data: patient name/DOB, coverage, decoded note (falls back to the request's note), ICD-10/CPT format checks. Reuses the `requestId` from step ③.",
+        "height": 250,
+        "width": 300,
+        "color": 5
+      },
+      "id": "18ee2eaf-ee45-4093-a0f5-302eae2f5c1b",
+      "name": "Note - Code - Merge FHIR + Decode Notes1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -26764,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑮ Parse AI Response\nSafely parses the AI JSON (fallback values if it fails – never stops the flow). Sets `reviewRequired` when: no note, AI flags insufficient docs, emergent, or < 3 days. Name says Claude, but it reads OpenAI output.",
+        "height": 250,
+        "width": 300,
+        "color": 6
+      },
+      "id": "bd4fe856-85f3-4b8c-b256-78eb377b7320",
+      "name": "Note - Code - Parse Claude Response",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -26092,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑯ Needs Physician Review?\nReads the flags from ⑮ (by node name, because the Supabase log now sits in between).\n✅ true → log + email physician + wait\n❌ false → eligibility check",
+        "height": 250,
+        "width": 300,
+        "color": 2
+      },
+      "id": "34be6838-5942-4671-87e1-f1470f5ea666",
+      "name": "Note - IF - Physician Review Required",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -25420,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑭ AI Clinical Extraction\nGPT-4o (temp 0, JSON mode) reads the note + codes and returns: justification, evidence, prior treatments, urgency, duration, necessity statement, **documentation gaps**. Told to use only facts in the note.",
+        "height": 250,
+        "width": 300,
+        "color": 6
+      },
+      "id": "bfb6d00b-968f-4d4a-9616-1304ac5631ef",
+      "name": "Note - Clinical Extraction",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -26428,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑰ Physician Review Email\nSends the physician the summary, evidence and gaps with **APPROVE & SUBMIT** / **REJECT** buttons. Buttons hit this run's resume URL (`?action=approve|reject`).",
+        "height": 250,
+        "width": 300,
+        "color": 2
+      },
+      "id": "ffb64e40-da8c-492a-8f58-f9666647a10f",
+      "name": "Note - Gmail - Physician Review Alert",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -24748,
+        -1806
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑱ Wait for Decision\nPauses the run until a button is clicked (webhook resume) or 24 hours pass. The click's `?action=` comes through as `query.action`.",
+        "height": 250,
+        "width": 300,
+        "color": 2
+      },
+      "id": "038d7dc7-e669-4831-9abc-92e8ad0367eb",
+      "name": "Note - Wait - Physician Decision",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -24412,
+        -1806
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑲ Physician Approved?\n`action == approve` → continue to eligibility.\nReject **or timeout** (no action = `expired`) → 'not submitted' email.",
+        "height": 250,
+        "width": 300,
+        "color": 2
+      },
+      "id": "f19b846e-529a-478f-81c6-39c92b5b40f9",
+      "name": "Note - IF - Physician Approved",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -24076,
+        -1806
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑳ Not Submitted Email\nTells billing the PA was **not** sent and why (rejected or no reply in 24 h). Manual follow-up needed. Flow ends.",
+        "height": 250,
+        "width": 300,
+        "color": 3
+      },
+      "id": "6ea86ee9-6611-40bc-8050-f3b7a435742a",
+      "name": "Note - Gmail - Not Submitted (Physician)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -23740,
+        -1422
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉑ Availity Eligibility\n`POST /coverages` (OAuth2) with payer, NPI, member ID, name, DOB, service type 30 (general health). Starts a real-time insurance check.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "e3df24a6-978a-44fa-b5c6-c15635267d4b",
+      "name": "Note - Availity - Eligibility",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -23068,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉒ Evaluate Eligibility\nReads the payer reply: statusCode 4 + active plan → `active`; 4 without → `inactive`; 0 → `in_process` (retry); anything else → `error`. Gives up after 5 polls (`$runIndex`).",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "a1e0b6ce-e526-4645-a2ba-72aadc18e631",
+      "name": "Note - Code - Evaluate Eligibility",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -22732,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉓ Route by Eligibility\nactive → build PA request\nin_process → wait & poll again\ninactive / error → failure email",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "44376d3d-0ee0-4c10-9a8c-e8088c9215a9",
+      "name": "Note - Switch - Eligibility",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -22396,
+        -1268
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉔ Wait (poll delay)\nPauses **3 seconds** before asking Availity again for a pending eligibility result. (Unit now set explicitly to seconds.)",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "f815b807-2d27-4828-a069-22129042a51c",
+      "name": "Note - Wait - 3s",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -22060,
+        -846
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉕ Poll Eligibility\n`GET /coverages/{coverageId}` to fetch the updated result, then loops back to ㉒. Forms a retry loop (max 5).",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "cdb985c6-85be-4045-a3fc-c7e737317f61",
+      "name": "Note - Availity - Poll Eligibility",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -21724,
+        -846
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉖ Eligibility Failure Email\nInsurance inactive, payer error, or no answer after 5 polls. Tells billing to verify coverage. Flow ends.",
+        "height": 250,
+        "width": 300,
+        "color": 3
+      },
+      "id": "85a56412-d752-4d9f-9df1-21de978f992a",
+      "name": "Note - Gmail - Eligibility Failure",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -22060,
+        -385
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉗ Build PA Request\nAssembles the payer submission: provider + org NPI, patient, CPT/ICD codes, urgency code (R/U/E), necessity statement + justification. Also decides mock vs live and the mock outcome.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "5d516ea8-681c-4562-acbc-093f205554b2",
+      "name": "Note - Code - Build PA Request",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -22060,
+        -1691
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉘ Mock or Live?\n`mode == mock` → simulated payer response (safe testing)\notherwise → real Availity submission",
+        "height": 250,
+        "width": 300,
+        "color": 7
+      },
+      "id": "503202af-4c12-419c-a614-7a76bc9e72d9",
+      "name": "Note - IF - Mock Mode",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -21724,
+        -1691
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉙ Mock Payer Response\nFakes a payer reply for testing: approved (auth # + 90-day validity), denied (NMN), pending (tracking ID) or error. Pick with `mock_outcome` in the request or Config.",
+        "height": 250,
+        "width": 300,
+        "color": 7
+      },
+      "id": "05448bf8-343d-40d4-9c92-bb093993079e",
+      "name": "Note - Code - Mock Availity PA Response",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -21388,
+        -1998
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉚ Submit PA (Live)\n`POST /service-reviews` with the PA request. ⚠️ Placeholder – Service Reviews isn't in Availity Demo; confirm URL & payload in Availity Service Reviews docs before going live.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "ef215f26-bcd5-46d4-88e8-7a5493f7e0d3",
+      "name": "Note - Availity - Submit Prior Auth (Live)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -21388,
+        -1499
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉛ Normalize PA Response\nMaps any payer format (mock or live) to one status: approved / denied / pending / error, plus auth #, tracking ID, denial reason/code, validity dates.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "2314148d-24f0-496f-ae99-7f8fabb7da23",
+      "name": "Note - Code - Normalize PA Response",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -21052,
+        -1691
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉜ Route by Outcome\napproved → care-team email\ndenied → AI appeal letter\npending → billing email\nerror → submission-error email",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "13ca17b7-d615-4db2-a5b2-9888de58f1fa",
+      "name": "Note - Switch - PA Outcome",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20716,
+        -1691
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉝ Approved Email\nTells the care team the auth #, validity dates, patient and procedure. Subject gets `[TEST]` in mock mode.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "27ada501-a057-47b6-8624-10171fa19391",
+      "name": "Note - Gmail - Approved",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20380,
+        -2267
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉞ AI Appeal Letter\nGPT-4o drafts an appeal addressing the denial reason using only the case facts; placeholders like [Physician Name] for missing details.",
+        "height": 250,
+        "width": 300,
+        "color": 6
+      },
+      "id": "2abd5b6a-e13d-44d8-a1a7-c1a5ddf700ba",
+      "name": "Note - OpenAI - Appeal Letter",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20380,
+        -1844
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㉟ Denied + Appeal Email\nSends the physician the denial reason and the draft appeal letter to review before sending to the payer.",
+        "height": 250,
+        "width": 300,
+        "color": 3
+      },
+      "id": "5174fe1e-d620-451a-b4e7-9916a7a749a4",
+      "name": "Note - Gmail - Denied + Appeal Letter",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20044,
+        -1844
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㊱ Pending Email\nTells billing the payer pended the request + tracking ID, and that the status is re-checked automatically every 6 hours.",
+        "height": 250,
+        "width": 300,
+        "color": 2
+      },
+      "id": "0136148d-ae69-46b3-b1b2-d8f4952398e7",
+      "name": "Note - Gmail - Pending",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20380,
+        -1422
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ㊲ Submission Error Email\nPayer call failed. Shows the error and asks billing to submit manually in Availity.",
+        "height": 250,
+        "width": 300,
+        "color": 3
+      },
+      "id": "cf71a9c8-de41-465e-a845-058a3aa7ad7c",
+      "name": "Note - Gmail - Submission Error",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -20380,
+        -961
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Prior Authorization Automation\n**Goal:** take a PA request from the EHR side, pull the patient's chart from **Epic FHIR**, let **GPT-4o** write the medical-necessity justification, get a **physician sign-off** when needed, check **insurance eligibility** and submit the PA via **Availity**, then email the right person with the result (and an AI appeal letter if denied).\n\n**Phase 6 (this version):** every outcome is written to Supabase (`log_prior_auth`), with patient name/DOB encrypted. Anything a person must act on gets `needs_manual_review = true`. Pending requests are re-checked by the separate *Prior Auth – Pending Status Poller* workflow. 🗄️ = Supabase log node (they never stop the workflow if Supabase is down).\n\n**Colour key**\n🟨 Intake & validation · 🟦 Epic FHIR data · 🟪 AI steps · 🟧 Human review / pending · 🟩 Availity eligibility & submission · ⬜ Config / mock · 🟥 Stop / failure emails\n\n**Before go-live:** set ORG_NPI & real emails in Config, switch AVAILITY_PA_MODE to `live` only after confirming the Service Reviews endpoint, and make sure a HIPAA BAA covers sending PHI to OpenAI.",
+        "height": 520,
+        "width": 620,
+        "color": 7
+      },
+      "id": "6ecaf438-827b-4860-90e0-826d76790214",
+      "name": "Note - Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -29452,
+        -2757
+      ]
+    },
+    {
+      "parameters": {
+        "useJson": true,
+        "claimsJson": "={{ JSON.stringify({ iss: $('Config1').first().json.EPIC_CLIENT_ID, sub: $('Config1').first().json.EPIC_CLIENT_ID, aud: $('Config1').first().json.EPIC_TOKEN_URL, jti: $execution.id + '-' + Date.now() + '-' + Math.random().toString(36).slice(2), exp: Math.floor(Date.now() / 1000) + 240 }) }}",
+        "options": {
+          "kid": "saids-prior-auth-key-2"
+        }
+      },
+      "id": "8d265fe0-6055-4ddc-a148-2df2eb4e8585",
+      "name": "Epic - Sign JWT",
+      "type": "n8n-nodes-base.jwt",
+      "typeVersion": 1,
+      "position": [
+        -28008,
+        -998
+      ],
+      "credentials": {
+        "jwtAuth": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "jwtAuth (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.EPIC_TOKEN_URL }}",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "grant_type",
+              "value": "client_credentials"
+            },
+            {
+              "name": "client_assertion_type",
+              "value": "urn:ietf:params:oauth:client-assertion-type:jwt-bearer"
+            },
+            {
+              "name": "client_assertion",
+              "value": "={{ $json.token }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "a437ebdc-c18a-4e29-b958-8af870e527d3",
+      "name": "Epic - Get Access Token",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -27672,
+        -998
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "prior-auth-request",
+        "options": {}
+      },
+      "id": "a9cd4f21-a04f-4479-a06a-bfb06085250d",
+      "name": "Webhook - Prior Auth Request1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -29352,
+        -730
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-patient-id",
+              "leftValue": "={{ $json.patient_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "cond-encounter-id",
+              "leftValue": "={{ $json.encounter_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "cond-procedure-code",
+              "leftValue": "={{ $json.procedure_code }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "cond-diagnosis-codes",
+              "leftValue": "={{ $json.diagnosis_codes }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "cond-payer-id",
+              "leftValue": "={{ $json.payer_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "cond-physician-npi",
+              "leftValue": "={{ $json.physician_npi }}",
+              "rightValue": "^[0-9]{10}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "457916c7-5a97-45d8-8462-485767f58f77",
+      "name": "IF - Validate Required Fields1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -28344,
+        -730
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8336bed4-d45b-4803-9415-095c9972a786",
+              "name": "EPIC_FHIR_BASE_URL",
+              "value": "https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4",
+              "type": "string"
+            },
+            {
+              "id": "5715255c-6b85-4e7b-99e7-9e9003d6976f",
+              "name": "EPIC_CLIENT_ID",
+              "value": "YOUR_EPIC_CLIENT_ID",
+              "type": "string"
+            },
+            {
+              "id": "80cbb66b-c0e9-4e2c-8795-0c508a368bbf",
+              "name": "AVAILITY_BASE_URL",
+              "value": "https://api.availity.com/v1",
+              "type": "string"
+            },
+            {
+              "id": "50544a4d-fe82-4a34-ad2b-e32e7ca4799a",
+              "name": "ORG_NPI",
+              "value": "YOUR_ORG_NPI",
+              "type": "string"
+            },
+            {
+              "id": "9efdb437-ea80-4a8f-928c-48480f97ee80",
+              "name": "PHYSICIAN_EMAIL",
+              "value": "user@example.com",
+              "type": "string"
+            },
+            {
+              "id": "c4313fbb-e45d-4d83-ae95-de0d5e5385e2",
+              "name": "BILLING_STAFF_EMAIL",
+              "value": "user@example.com",
+              "type": "string"
+            },
+            {
+              "id": "7ba045c2-b902-4f21-986e-cfa5edbc86f7",
+              "name": "CARE_TEAM_EMAIL",
+              "value": "user@example.com",
+              "type": "string"
+            },
+            {
+              "id": "5888e0d7-1a71-4c61-ab6d-06ca4b7aaa39",
+              "name": "APPROVAL_BASE_URL",
+              "value": "(not used - approval links use the Wait node resume URL)",
+              "type": "string"
+            },
+            {
+              "id": "854bbbe1-db75-4abd-891a-3cabb822e5f0",
+              "name": "EPIC_TOKEN_URL",
+              "value": "https://fhir.epic.com/interconnect-fhir-oauth/oauth2/token",
+              "type": "string"
+            },
+            {
+              "id": "49127a9c-2813-4a01-ba1d-8bb1667f9cd4",
+              "name": "AVAILITY_PA_MODE",
+              "value": "mock",
+              "type": "string"
+            },
+            {
+              "id": "7cd53696-80f7-49ff-abaf-7c277f5f3538",
+              "name": "MOCK_PA_OUTCOME",
+              "value": "approved",
+              "type": "string"
+            },
+            {
+              "id": "9089f9b8-8e40-4ba3-9e13-0ea1f83d28fc",
+              "name": "AVAILITY_SUBMITTER_ID",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "d245460b-8455-4261-aef5-d1668a2df028",
+              "name": "SUPABASE_URL",
+              "value": "https://YOUR-PROJECT-REF.supabase.co",
+              "type": "string"
+            },
+            {
+              "id": "f48e0794-3c18-48b0-8bf1-30bbbac85b15",
+              "name": "PENDING_POLL_HOURS",
+              "value": "6",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "9eae0a3f-c8cd-441e-bb74-e1d47a9b41eb",
+      "name": "Config1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -29016,
+        -730
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Flatten webhook body + normalize field types\nconst body = $('Webhook - Prior Auth Request1').first().json.body || {};\nlet dx = body.diagnosis_codes ?? body.diagnosis_code ?? [];\nif (typeof dx === 'string') dx = dx.split(',');\ndx = dx.map(c => String(c).trim().toUpperCase()).filter(Boolean);\nconst s = v => (v === undefined || v === null) ? '' : String(v).trim();\nreturn [{ json: {\n  patient_id: s(body.patient_id),\n  encounter_id: s(body.encounter_id),\n  procedure_code: s(body.procedure_code).toUpperCase(),\n  diagnosis_codes: dx,\n  physician_npi: s(body.physician_npi),\n  payer_id: s(body.payer_id),\n  payer_member_id: s(body.payer_member_id),\n  clinical_note: s(body.clinical_note),\n  mock_outcome: s(body.mock_outcome).toLowerCase(),\n  // One ID for the whole run: emails, Supabase and Availity all use it.\n  // Random suffix avoids collisions when many requests arrive in the same millisecond.\n  requestId: 'AUTH-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase()\n}}];"
+      },
+      "id": "2bfab461-8b4e-41c3-95c9-086fbc49a811",
+      "name": "Code - Normalize Request1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -28680,
+        -730
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config1').first().json.BILLING_STAFF_EMAIL }}",
+        "subject": "Prior Auth Request Rejected - Missing/Invalid Fields",
+        "message": "=<p>A prior authorization request was rejected because required fields are missing or invalid.</p><ul><li>patient_id: {{ $json.patient_id ? 'OK' : 'MISSING' }}</li><li>encounter_id: {{ $json.encounter_id ? 'OK' : 'MISSING' }}</li><li>procedure_code: {{ $json.procedure_code ? 'OK' : 'MISSING' }}</li><li>diagnosis_codes: {{ ($json.diagnosis_codes || []).length ? 'OK' : 'MISSING' }}</li><li>payer_id: {{ $json.payer_id ? 'OK' : 'MISSING' }}</li><li>physician_npi: {{ /^[0-9]{10}$/.test($json.physician_npi || '') ? 'OK' : 'MISSING / INVALID (must be 10 digits)' }}</li></ul><p>Please correct and resubmit.</p>",
+        "options": {}
+      },
+      "id": "95a6b530-098d-44b6-b1e5-0a169dd4093f",
+      "name": "Gmail - Rejection Email1",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -28008,
+        -307
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config1').first().json.EPIC_FHIR_BASE_URL }}/Patient/{{ $('Code - Normalize Request1').first().json.patient_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/fhir+json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Epic - Get Access Token').first().json.access_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "604a8ef9-9f08-409b-a9d4-8629fb10f45b",
+      "name": "Epic FHIR - Get Patient1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -27336,
+        -1574
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config1').first().json.EPIC_FHIR_BASE_URL }}/Encounter/{{ $('Code - Normalize Request1').first().json.encounter_id }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/fhir+json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Epic - Get Access Token').first().json.access_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "88167c4b-3e9c-4484-ae39-90fe659ec032",
+      "name": "Epic FHIR - Get Encounter1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -27336,
+        -1190
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config1').first().json.EPIC_FHIR_BASE_URL }}/DocumentReference",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "patient",
+              "value": "={{ $('Code - Normalize Request1').first().json.patient_id }}"
+            },
+            {
+              "name": "type",
+              "value": "11506-3"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/fhir+json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Epic - Get Access Token').first().json.access_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "d6a09b22-7f3f-4545-890a-223a51da754a",
+      "name": "Epic FHIR - Get Clinical Notes1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -27336,
+        -806
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config1').first().json.EPIC_FHIR_BASE_URL }}/Coverage",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "patient",
+              "value": "={{ $('Code - Normalize Request1').first().json.patient_id }}"
+            },
+            {
+              "name": "status",
+              "value": "active"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/fhir+json"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('Epic - Get Access Token').first().json.access_token }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "2ac9e8bd-6e0c-4e82-bd8b-a107a4b85ea3",
+      "name": "Epic FHIR - Get Coverage1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -27336,
+        -422
+      ]
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "id": "75a59730-4033-4308-9316-02cdc5dba573",
+      "name": "Merge - FHIR Responses1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -27000,
+        -998
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge FHIR data + decode clinical notes + validate codes\n// Parse FHIR responses even if n8n returned them as text\nconst fhir = (name) => {\n  let x = $(name).first().json || {};\n  if (typeof x.data === 'string') { try { x = JSON.parse(x.data); } catch (e) {} }\n  return x;\n};\nconst webhookData = $('Code - Normalize Request1').first().json;\nconst patientRes = fhir('Epic FHIR - Get Patient1');\nconst encounterRes = fhir('Epic FHIR - Get Encounter1');\nconst notesRes = fhir('Epic FHIR - Get Clinical Notes1');\nconst coverageRes = fhir('Epic FHIR - Get Coverage1');\n\n// Extract patient name from FHIR HumanName\nlet patientName = 'Unknown';\nlet firstName = '';\nlet lastName = '';\nif (patientRes.name && patientRes.name[0]) {\n  const given = (patientRes.name[0].given || []).join(' ');\n  const family = patientRes.name[0].family || '';\n  patientName = `${given} ${family}`.trim();\n  firstName = (patientRes.name[0].given || [])[0] || '';\n  lastName = family;\n}\n\nconst patientDob = patientRes.birthDate || null;\nconst patientGender = patientRes.gender || null;\n\n// Extract active coverage\nlet memberId = webhookData.payer_member_id || null;\nlet groupNumber = null;\nlet payerName = null;\nif (coverageRes.entry && coverageRes.entry[0] && coverageRes.entry[0].resource) {\n  const cov = coverageRes.entry[0].resource;\n  memberId = cov.subscriberId || cov.identifier?.[0]?.value || memberId;\n  groupNumber = cov.class?.[0]?.value || null;\n  payerName = cov.payor?.[0]?.display || null;\n}\n\n// Decode clinical note (Base64)\nlet clinicalNote = '';\ntry {\n  if (notesRes.entry && notesRes.entry[0]?.resource?.content?.[0]?.attachment?.data) {\n    const b64 = notesRes.entry[0].resource.content[0].attachment.data;\n    clinicalNote = Buffer.from(b64, 'base64').toString('utf-8');\n  }\n} catch (e) {\n  clinicalNote = '[Unable to decode clinical note]';\n}\n// Fallback: use note sent in the request if Epic text is unavailable\nlet noteSource = clinicalNote ? 'epic' : null;\nif (!clinicalNote && webhookData.clinical_note) { clinicalNote = webhookData.clinical_note; noteSource = 'request'; }\n// Epic usually returns a Binary link instead of inline text (needs Binary.Read API)\nconst noteBinaryUrl = notesRes.entry?.[0]?.resource?.content?.[0]?.attachment?.url || null;\nconst noteCount = (notesRes.entry || []).filter(e => e.resource?.resourceType === 'DocumentReference').length;\n\n// Generate unique requestId\nconst requestId = webhookData.requestId || ('AUTH-' + Date.now());\n\n// Normalize diagnosis codes (support both diagnosis_code and diagnosis_codes)\nlet diagnosisCodes = webhookData.diagnosis_codes || [];\nif (typeof diagnosisCodes === 'string') {\n  diagnosisCodes = [diagnosisCodes];\n}\n\n// Validate ICD-10 format\nconst icd10Regex = /^[A-Z][0-9]{2}(\\.[A-Z0-9]{1,4})?$/;\nconst invalidIcd = diagnosisCodes.filter(c => !icd10Regex.test(c));\n\n// Validate CPT format\nconst cptRegex = /^[0-9]{4}[0-9A-Z]$|^[0-9]{4}F$/;\nconst procedureCode = webhookData.procedure_code;\nconst isValidCpt = cptRegex.test(procedureCode);\n\nreturn [{\n  json: {\n    requestId,\n    mock_outcome: webhookData.mock_outcome || '',\n    patient_id: webhookData.patient_id,\n    encounter_id: webhookData.encounter_id,\n    procedure_code: procedureCode,\n    diagnosis_codes: diagnosisCodes,\n    physician_npi: webhookData.physician_npi,\n    payer_id: webhookData.payer_id,\n    patient: {\n      name: patientName,\n      firstName,\n      lastName,\n      dateOfBirth: patientDob,\n      gender: patientGender,\n      memberId,\n      groupNumber\n    },\n    payerName,\n    clinicalNote,\n    encounter: encounterRes.resourceType === 'Encounter' ? { id: encounterRes.id, status: encounterRes.status, type: encounterRes.type?.[0]?.text || null, period: encounterRes.period || null } : null,\n    validation: {\n      invalidIcdCodes: invalidIcd,\n      isValidCpt,\n      hasClinicalNote: clinicalNote.length > 0,\n      noteSource,\n      noteCount,\n      noteBinaryUrl,\n      encounterFound: encounterRes.resourceType === 'Encounter'\n    }\n  }\n}];"
+      },
+      "id": "26c4c7e5-0c0e-483f-a48e-d9a7b7f0eb31",
+      "name": "Code - Merge FHIR + Decode Notes1",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -26664,
+        -998
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse AI (OpenAI) response safely with fallbacks\nconst mergeData = $('Code - Merge FHIR + Decode Notes1').first().json;\nconst claudeRes = $input.first().json;\n\nlet clinical = {\n  primary_diagnosis: mergeData.diagnosis_codes[0] || 'Unknown',\n  secondary_diagnoses: mergeData.diagnosis_codes.slice(1) || [],\n  procedure_requested: 'Procedure ' + mergeData.procedure_code,\n  procedure_cpt_code: mergeData.procedure_code,\n  clinical_justification: 'Clinical justification could not be generated automatically. Manual review required.',\n  supporting_evidence: [],\n  alternative_treatments_tried: [],\n  urgency_level: 'routine',\n  estimated_duration_days: 30,\n  medical_necessity_statement: 'Medical necessity determination pending clinical review.'\n};\n\ntry {\n  let text = '';\n  if (claudeRes.choices && claudeRes.choices[0]?.message?.content) {\n    text = claudeRes.choices[0].message.content; // OpenAI\n  } else if (claudeRes.content && claudeRes.content[0] && claudeRes.content[0].text) {\n    text = claudeRes.content[0].text; // Claude\n  } else if (typeof claudeRes === 'string') {\n    text = claudeRes;\n  }\n\n  // Strip markdown fences\n  text = text.replace(/```json|```/g, '').trim();\n  const parsed = JSON.parse(text);\n\n  clinical = {\n    primary_diagnosis: parsed.primary_diagnosis || clinical.primary_diagnosis,\n    secondary_diagnoses: parsed.secondary_diagnoses || clinical.secondary_diagnoses,\n    procedure_requested: parsed.procedure_requested || clinical.procedure_requested,\n    procedure_cpt_code: parsed.procedure_cpt_code || clinical.procedure_cpt_code,\n    clinical_justification: parsed.clinical_justification || clinical.clinical_justification,\n    supporting_evidence: parsed.supporting_evidence || [],\n    alternative_treatments_tried: parsed.alternative_treatments_tried || [],\n    urgency_level: ['routine', 'urgent', 'emergent'].includes(parsed.urgency_level)\n      ? parsed.urgency_level\n      : 'routine',\n    estimated_duration_days: typeof parsed.estimated_duration_days === 'number'\n      ? parsed.estimated_duration_days\n      : 30,\n    medical_necessity_statement: parsed.medical_necessity_statement || clinical.medical_necessity_statement,\n    documentation_gaps: parsed.documentation_gaps || [],\n    insufficient_documentation: parsed.insufficient_documentation === true\n  };\n} catch (e) {\n  // Keep fallback values — never halt workflow on AI parsing errors\n}\n\n// Never auto-submit without a real clinical note or when AI flags gaps\nconst noNote = !mergeData.validation?.hasClinicalNote;\nconst reviewRequired =\n  clinical.urgency_level === 'emergent' ||\n  clinical.estimated_duration_days < 3 ||\n  noNote ||\n  clinical.insufficient_documentation === true;\n\nreturn [{\n  json: {\n    ...mergeData,\n    clinical,\n    auditTrail: {\n      reviewRequired,\n      reviewReason: noNote ? 'No clinical note retrieved from EHR' : (clinical.insufficient_documentation ? 'AI flagged insufficient documentation' : (clinical.urgency_level === 'emergent' ? 'Emergent case' : (clinical.estimated_duration_days < 3 ? 'Short duration' : null))),\n      extractedAt: new Date().toISOString(),\n      aiError: claudeRes.error ? (claudeRes.error.message || JSON.stringify(claudeRes.error)) : null\n    }\n  }\n}];"
+      },
+      "id": "a85ca168-efd0-4419-b198-9dcf11a1fd73",
+      "name": "Code - Parse Claude Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -25992,
+        -998
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cond-review-required",
+              "leftValue": "={{ $('Code - Parse Claude Response').first().json.auditTrail.reviewRequired }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "cond-emergent",
+              "leftValue": "={{ $('Code - Parse Claude Response').first().json.clinical.urgency_level }}",
+              "rightValue": "emergent",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "9b56164e-8b42-4265-b7e1-180018133dd7",
+      "name": "IF - Physician Review Required",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -25320,
+        -998
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o', temperature: 0, max_tokens: 1500, response_format: { type: 'json_object' }, messages: [ { role: 'system', content: \"You are a senior clinical documentation specialist with 20 years of healthcare prior authorization experience. Given a physician's clinical note and ICD-10 / CPT codes, extract and return a prior authorization justification as a JSON object only. Return JSON with: primary_diagnosis, secondary_diagnoses[], procedure_requested, procedure_cpt_code, clinical_justification (3-5 sentences), supporting_evidence[], alternative_treatments_tried[], urgency_level (routine|urgent|emergent), estimated_duration_days (number), medical_necessity_statement (1 sentence for payer form field). STRICT RULES: Use ONLY facts explicitly stated in the clinical note. Never invent or assume symptoms, imaging findings, test results or prior treatments. supporting_evidence and alternative_treatments_tried must contain only items written in the note; if none are written, return empty arrays. Also return documentation_gaps[] listing what a payer would expect that the note does not contain, and insufficient_documentation (boolean). If the clinical note is missing, return empty evidence arrays, set insufficient_documentation to true, and say so in clinical_justification.\" }, { role: 'user', content: 'Clinical Note:\\n' + ($json.clinicalNote || '[No clinical note found]') + '\\n\\nRequested Procedure CPT: ' + $json.procedure_code + '\\nDiagnosis Codes (ICD-10): ' + JSON.stringify($json.diagnosis_codes) + '\\n\\nReturn the prior authorization justification JSON.' } ] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "5999a620-5f4c-45d0-afa5-04050b40a59e",
+      "name": "Clinical Extraction",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -26328,
+        -998
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "openAiApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config1').first().json.PHYSICIAN_EMAIL }}",
+        "subject": "=Prior Auth Review Required - {{ $('Code - Parse Claude Response').first().json.requestId }}",
+        "message": "=<p><strong>Prior authorization needs your review</strong></p><p>Request ID: <strong>{{ $('Code - Parse Claude Response').first().json.requestId }}</strong><br>Reason for review: {{ $('Code - Parse Claude Response').first().json.auditTrail.reviewReason }}<br>Urgency: {{ $('Code - Parse Claude Response').first().json.clinical.urgency_level }}</p><p><strong>Procedure:</strong> {{ $('Code - Parse Claude Response').first().json.procedure_code }} – {{ $('Code - Parse Claude Response').first().json.clinical.procedure_requested }}<br><strong>Diagnoses:</strong> {{ $('Code - Parse Claude Response').first().json.diagnosis_codes.join(', ') }}</p><p><strong>Medical necessity:</strong> {{ $('Code - Parse Claude Response').first().json.clinical.medical_necessity_statement }}</p><p><strong>Justification:</strong> {{ $('Code - Parse Claude Response').first().json.clinical.clinical_justification }}</p><p><strong>Evidence:</strong></p><ul>{{ ($('Code - Parse Claude Response').first().json.clinical.supporting_evidence || []).map(e => '<li>' + e + '</li>').join('') || '<li>None found in note</li>' }}</ul><p><strong>Documentation gaps:</strong></p><ul>{{ ($('Code - Parse Claude Response').first().json.clinical.documentation_gaps || []).map(e => '<li>' + e + '</li>').join('') || '<li>None</li>' }}</ul><p><a href=\"{{ $execution.resumeUrl }}?action=approve\" style=\"background:#16a34a;color:#fff;padding:10px 18px;text-decoration:none;border-radius:4px;margin-right:8px\">APPROVE &amp; SUBMIT</a><a href=\"{{ $execution.resumeUrl }}?action=reject\" style=\"background:#dc2626;color:#fff;padding:10px 18px;text-decoration:none;border-radius:4px\">REJECT</a></p><p><em>Links expire in 24 hours. No action = not submitted.</em></p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "23ce5228-eec1-494e-90eb-13990f4f6d9e",
+      "name": "Gmail - Physician Review Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -24648,
+        -1536
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "limitWaitTime": true,
+        "resumeAmount": 24,
+        "options": {}
+      },
+      "id": "bc7b9e3e-9dff-484b-abd3-f723ac9d680d",
+      "name": "Wait - Physician Decision",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -24312,
+        -1536
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "35555731-dd06-4059-8e36-a1ae4a23be1c",
+              "leftValue": "={{ $json.query?.action || 'expired' }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "fe679adc-5761-43a4-8124-3aaae6d384ba",
+      "name": "IF - Physician Approved",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -23976,
+        -1536
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config1').first().json.BILLING_STAFF_EMAIL }}",
+        "subject": "=Prior Auth NOT submitted - {{ $('Code - Parse Claude Response').first().json.requestId }}",
+        "message": "=<p>Prior authorization <strong>{{ $('Code - Parse Claude Response').first().json.requestId }}</strong> was not submitted.</p><p>Physician decision: <strong>{{ $json.query?.action || 'no response within 24 hours' }}</strong></p><p>Procedure {{ $('Code - Parse Claude Response').first().json.procedure_code }}. Please review manually.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "259a8d19-38b2-46cf-82c9-804bdc927fff",
+      "name": "Gmail - Not Submitted (Physician)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -23640,
+        -1152
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.AVAILITY_BASE_URL }}/coverages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "payerId",
+              "value": "={{ $('Code - Parse Claude Response').first().json.payer_id }}"
+            },
+            {
+              "name": "providerNpi",
+              "value": "={{ $('Code - Parse Claude Response').first().json.physician_npi }}"
+            },
+            {
+              "name": "memberId",
+              "value": "={{ $('Code - Parse Claude Response').first().json.patient.memberId }}"
+            },
+            {
+              "name": "patientBirthDate",
+              "value": "={{ $('Code - Parse Claude Response').first().json.patient.dateOfBirth }}"
+            },
+            {
+              "name": "patientLastName",
+              "value": "={{ $('Code - Parse Claude Response').first().json.patient.lastName }}"
+            },
+            {
+              "name": "patientFirstName",
+              "value": "={{ $('Code - Parse Claude Response').first().json.patient.firstName }}"
+            },
+            {
+              "name": "serviceType",
+              "value": "30"
+            },
+            {
+              "name": "asOfDate",
+              "value": "={{ $now.toFormat('yyyy-MM-dd') }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "88d828bd-09ea-4fa0-8fe9-07c622b6acc1",
+      "name": "Availity - Eligibility",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -22968,
+        -998
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "oAuth2Api (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Evaluate Availity coverage response (handles In Process polling)\nconst res = $input.first().json || {};\nconst cov = (res.coverages && res.coverages[0]) || res;\nconst statusCode = String(cov.statusCode ?? '');\nconst plans = cov.plans || [];\nconst ACTIVE = ['1','2','3','4','5'];          // X12 EB01 active codes\nconst activePlan = plans.find(p => ACTIVE.includes(String(p.statusCode)));\nconst polls = $runIndex;                        // how many times we've looped\nlet eligibility, message;\nif (res.error || res.errors || res.userMessage) {\n  eligibility = 'error';\n  message = res.error || res.userMessage || JSON.stringify(res.errors);\n} else if (statusCode === '0') {\n  eligibility = polls >= 5 ? 'error' : 'in_process';\n  message = polls >= 5 ? 'Payer did not respond after 5 checks' : 'Payer still processing';\n} else if (statusCode === '4') {\n  eligibility = activePlan ? 'active' : 'inactive';\n  message = activePlan ? activePlan.status : (plans[0]?.status || 'No active plan returned');\n} else {\n  eligibility = 'error';\n  message = cov.status || ('Unexpected status code ' + statusCode);\n}\nreturn [{ json: {\n  eligibility, message,\n  coverageId: cov.id || null,\n  coverageStatus: cov.status || null,\n  planStatus: activePlan?.status || plans[0]?.status || null,\n  payerName: cov.payer?.name || null,\n  validationMessages: cov.validationMessages || [],\n  polls\n}}];"
+      },
+      "id": "287c9ce2-1d18-4a4f-b94b-88dcaa685d0a",
+      "name": "Code - Evaluate Eligibility",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -22632,
+        -998
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.eligibility }}",
+                    "rightValue": "active",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "active"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.eligibility }}",
+                    "rightValue": "in_process",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "in_process"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.eligibility }}",
+                    "rightValue": "inactive",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "inactive"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "error"
+        }
+      },
+      "id": "efd000a4-2595-4de8-9990-69f1bc12ff19",
+      "name": "Switch - Eligibility",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -22296,
+        -998
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "seconds"
+      },
+      "id": "88770405-01fb-4d52-bca4-1fb6b018bd6a",
+      "name": "Wait - 3s",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -21960,
+        -576
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config1').first().json.AVAILITY_BASE_URL }}/coverages/{{ $('Code - Evaluate Eligibility').last().json.coverageId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "2e44de88-8ea8-42a8-9a52-ce1597c5fa0a",
+      "name": "Availity - Poll Eligibility",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -21624,
+        -576
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "oAuth2Api (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config1').first().json.BILLING_STAFF_EMAIL }}",
+        "subject": "=Eligibility check failed - {{ $('Code - Parse Claude Response').first().json.requestId }}",
+        "message": "=<p>Prior authorization <strong>{{ $('Code - Parse Claude Response').first().json.requestId }}</strong> was stopped at the eligibility check.</p><p>Result: <strong>{{ $json.eligibility }}</strong> – {{ $json.message }}</p><p>Payer ID: {{ $('Code - Parse Claude Response').first().json.payer_id }} | Member ID: {{ $('Code - Parse Claude Response').first().json.patient.memberId }}</p><p>Please verify coverage and resubmit.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "0b0eb49f-6978-4093-b8b6-3c03ab60cbad",
+      "name": "Gmail - Eligibility Failure",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -21960,
+        -115
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the service review (prior auth) request\nconst c = $('Code - Parse Claude Response').first().json;\nconst cfg = $('Config1').first().json;\nconst urgencyMap = { routine: 'R', urgent: 'U', emergent: 'E' };\nconst request = {\n  payerId: c.payer_id,\n  requestingProvider: { npi: c.physician_npi, organizationNpi: cfg.ORG_NPI },\n  patient: { memberId: c.patient.memberId, firstName: c.patient.firstName, lastName: c.patient.lastName, birthDate: c.patient.dateOfBirth },\n  serviceRequest: {\n    procedureCodes: [c.procedure_code],\n    diagnosisCodes: c.diagnosis_codes,\n    urgencyCode: urgencyMap[c.clinical.urgency_level] || 'R'\n  },\n  clinicalInfo: {\n    medicalNecessityStatement: c.clinical.medical_necessity_statement,\n    clinicalNotes: c.clinical.clinical_justification\n  }\n};\nconst mode = (cfg.AVAILITY_PA_MODE || 'mock').toLowerCase();\nconst mockOutcome = (c.mock_outcome || cfg.MOCK_PA_OUTCOME || 'approved').toLowerCase();\nreturn [{ json: { mode, mockOutcome, request } }];"
+      },
+      "id": "c98b6ea7-afaf-452d-8e9e-24a76e9f2188",
+      "name": "Code - Build PA Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -21960,
+        -1421
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ea15d92f-eb23-4f79-b2d1-3793db5e52d2",
+              "leftValue": "={{ $json.mode }}",
+              "rightValue": "mock",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "591b9269-7a21-4d72-a421-9f935cc7b07d",
+      "name": "IF - Mock Mode",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -21624,
+        -1421
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simulated Availity service-review responses for testing\nconst outcome = $json.mockOutcome;\nconst now = Date.now();\nconst responses = {\n  approved: { status: 'approved', statusCode: 'A1', authorizationNumber: 'MOCK-A' + String(now).slice(-6), certificationEffectiveDate: $now.toFormat('yyyy-MM-dd'), certificationExpirationDate: $now.plus({ days: 90 }).toFormat('yyyy-MM-dd') },\n  denied:   { status: 'denied', statusCode: 'A3', denialReasonCode: 'NMN', denialReason: 'Not medically necessary - insufficient evidence of failed conservative therapy' },\n  pending:  { status: 'pending', statusCode: 'A4', trackingId: 'MOCK-TRK-' + String(now).slice(-6), message: 'Pended for medical review' },\n  error:    { error: 'Mock payer timeout' }\n};\nreturn [{ json: { ...(responses[outcome] || responses.approved), mock: true } }];"
+      },
+      "id": "e815fceb-b07e-47c8-a9ed-718d3bb81dc8",
+      "name": "Code - Mock Availity PA Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -21288,
+        -1728
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.AVAILITY_BASE_URL }}/service-reviews",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.request) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "a53fe4d9-ddea-47f5-8dac-4d6c4dcca31c",
+      "name": "Availity - Submit Prior Auth (Live)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -21288,
+        -1229
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "oAuth2Api (configure in n8n)"
+        }
+      },
+      "notes": "LIVE MODE PLACEHOLDER: Service Reviews is not in the Demo product. Confirm URL + payload against Availity Service Reviews 2.0.0 docs before using."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Normalize payer response -> approved | denied | pending | error\nconst r = $input.first().json || {};\nconst raw = String(r.status || r.authorizationStatus || r.certificationStatus || r.statusCode || '').toLowerCase();\nlet paStatus = 'error';\nif (['approved','a1','certified'].includes(raw)) paStatus = 'approved';\nelse if (['denied','a3','not_certified','rejected'].includes(raw)) paStatus = 'denied';\nelse if (['pending','a4','p','pended','in process','0'].includes(raw)) paStatus = 'pending';\nreturn [{ json: {\n  paStatus,\n  authNumber: r.authorizationNumber || r.authNumber || null,\n  trackingId: r.trackingId || r.id || null,\n  denialReason: r.denialReason || r.reason || null,\n  denialCode: r.denialReasonCode || r.reasonCode || null,\n  effectiveDate: r.certificationEffectiveDate || null,\n  expirationDate: r.certificationExpirationDate || null,\n  mock: r.mock === true,\n  rawError: paStatus === 'error' ? (r.error || r.userMessage || JSON.stringify(r).slice(0, 500)) : null\n}}];"
+      },
+      "id": "22112d65-316a-49ee-be21-ae1aa6d7d3f4",
+      "name": "Code - Normalize PA Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -20952,
+        -1421
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.paStatus }}",
+                    "rightValue": "approved",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "approved"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.paStatus }}",
+                    "rightValue": "denied",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "denied"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.paStatus }}",
+                    "rightValue": "pending",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "pending"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "error"
+        }
+      },
+      "id": "e3d487d0-d168-48cf-834d-c17046d2d5c5",
+      "name": "Switch - PA Outcome",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -20616,
+        -1421
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config1').first().json.CARE_TEAM_EMAIL }}",
+        "subject": "={{ $('Code - Normalize PA Response').first().json.mock ? '[TEST] ' : '' }}Prior Auth APPROVED - {{ $('Code - Parse Claude Response').first().json.requestId }}",
+        "message": "=<p><strong>Prior authorization approved</strong></p><p>Request ID: {{ $('Code - Parse Claude Response').first().json.requestId }}<br>Authorization #: <strong>{{ $json.authNumber }}</strong><br>Valid: {{ $json.effectiveDate }} to {{ $json.expirationDate }}</p><p>Patient: {{ $('Code - Parse Claude Response').first().json.patient.name }}<br>Procedure: {{ $('Code - Parse Claude Response').first().json.procedure_code }} – {{ $('Code - Parse Claude Response').first().json.clinical.procedure_requested }}</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "046d81f0-2207-4021-852b-1a4ba7a8d0d6",
+      "name": "Gmail - Approved",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -20280,
+        -1997
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'gpt-4o', temperature: 0.2, max_tokens: 1800, messages: [ { role: 'system', content: 'You are a clinical appeals specialist. Write a professional prior authorization appeal letter with sections: Header, Clinical Summary, Medical Necessity Argument, Supporting Evidence, Request for Reconsideration. Address the specific denial reason. STRICT RULE: use only clinical facts given in the input; never invent findings, dates or treatments. Where a guideline is relevant, refer to it generally (e.g. AAOS guidance) without inventing citations or quotes. Leave placeholders like [Physician Name] and [Practice Address] for details not provided. Plain text, no markdown.' }, { role: 'user', content: 'Denial reason: ' + ($json.denialReason || 'Not stated') + ' (code ' + ($json.denialCode || 'N/A') + ')' + '\\nPatient: ' + $('Code - Parse Claude Response').first().json.patient.name + ', DOB ' + $('Code - Parse Claude Response').first().json.patient.dateOfBirth + ', Member ID ' + $('Code - Parse Claude Response').first().json.patient.memberId + '\\nProcedure: ' + $('Code - Parse Claude Response').first().json.procedure_code + ' ' + $('Code - Parse Claude Response').first().json.clinical.procedure_requested + '\\nDiagnoses: ' + $('Code - Parse Claude Response').first().json.diagnosis_codes.join(', ') + '\\nClinical justification: ' + $('Code - Parse Claude Response').first().json.clinical.clinical_justification + '\\nSupporting evidence: ' + JSON.stringify($('Code - Parse Claude Response').first().json.clinical.supporting_evidence) + '\\nTreatments already tried: ' + JSON.stringify($('Code - Parse Claude Response').first().json.clinical.alternative_treatments_tried) + '\\nRequesting physician NPI: ' + $('Code - Parse Claude Response').first().json.physician_npi + '\\n\\nWrite the appeal letter.' } ] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "13d7cb49-7147-4712-9c5f-42a952a1929d",
+      "name": "OpenAI - Appeal Letter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -20280,
+        -1574
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "openAiApi (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config1').first().json.PHYSICIAN_EMAIL }}",
+        "subject": "={{ $('Code - Normalize PA Response').first().json.mock ? '[TEST] ' : '' }}Prior Auth DENIED - appeal letter ready - {{ $('Code - Parse Claude Response').first().json.requestId }}",
+        "message": "=<p><strong>Prior authorization denied</strong></p><p>Request ID: {{ $('Code - Parse Claude Response').first().json.requestId }}<br>Reason: {{ $('Code - Normalize PA Response').first().json.denialReason }} ({{ $('Code - Normalize PA Response').first().json.denialCode }})</p><hr><p><strong>Draft appeal letter (review before sending):</strong></p><pre style=\"white-space:pre-wrap;font-family:inherit\">{{ $json.choices?.[0]?.message?.content || ('Appeal letter could not be generated: ' + ($json.error?.message || 'unknown error')) }}</pre>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "823ee9a9-bf7f-4631-aee3-15efd2dbc1bc",
+      "name": "Gmail - Denied + Appeal Letter",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -19944,
+        -1574
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config1').first().json.BILLING_STAFF_EMAIL }}",
+        "subject": "={{ $('Code - Normalize PA Response').first().json.mock ? '[TEST] ' : '' }}Prior Auth PENDING - {{ $('Code - Parse Claude Response').first().json.requestId }}",
+        "message": "=<p>Prior authorization <strong>{{ $('Code - Parse Claude Response').first().json.requestId }}</strong> is pending with the payer.</p><p>Tracking ID: <strong>{{ $json.trackingId }}</strong></p><p>The status is checked automatically every {{ $('Config1').first().json.PENDING_POLL_HOURS || 6 }} hours. You will get another email when the payer decides.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "4763ffe5-e760-41ef-9c13-6082120ab230",
+      "name": "Gmail - Pending",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -20280,
+        -1152
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config1').first().json.BILLING_STAFF_EMAIL }}",
+        "subject": "={{ $('Code - Normalize PA Response').first().json.mock ? '[TEST] ' : '' }}Prior Auth submission ERROR - {{ $('Code - Parse Claude Response').first().json.requestId }}",
+        "message": "=<p>Prior authorization <strong>{{ $('Code - Parse Claude Response').first().json.requestId }}</strong> could not be submitted.</p><p>Error: {{ $json.rawError }}</p><p>Please submit manually in Availity.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "1abcd589-c868-4e45-906e-02411bc102be",
+      "name": "Gmail - Submission Error",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -20280,
+        -691
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ((c, cfg) => JSON.stringify({ p: { request_id: c.requestId, action: 'case_created', status: 'processing', is_mock: String(cfg.AVAILITY_PA_MODE || 'mock').trim().toLowerCase() === 'mock', procedure_code: c.procedure_code, diagnosis_codes: c.diagnosis_codes, payer_id: c.payer_id, payer_name: c.payerName, physician_npi: c.physician_npi, patient_name: c.patient.name, patient_dob: c.patient.dateOfBirth, urgency_level: c.clinical.urgency_level, review_required: c.auditTrail.reviewRequired, review_reason: c.auditTrail.reviewReason, n8n_execution_id: $execution.id, details: { has_clinical_note: c.validation.hasClinicalNote, note_source: c.validation.noteSource, encounter_found: c.validation.encounterFound, invalid_icd_codes: c.validation.invalidIcdCodes, cpt_format_valid: c.validation.isValidCpt, ai_error: !!c.auditTrail.aiError, documentation_gap_count: (c.clinical.documentation_gaps || []).length } } }))($('Code - Parse Claude Response').first().json, $('Config1').first().json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "c5b4c427-73e5-4743-938f-ae3ac2ed1bf0",
+      "name": "Supabase - Log Case Created",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -25656,
+        -998
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ (c => JSON.stringify({ p: { request_id: c.requestId, action: 'physician_review_requested', status: 'awaiting_physician', review_required: true, review_reason: c.auditTrail.reviewReason || (c.clinical.urgency_level === 'emergent' ? 'Emergent case' : null), n8n_execution_id: $execution.id, details: { urgency: c.clinical.urgency_level, link_expires_hours: 24 } } }))($('Code - Parse Claude Response').first().json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "ec4a4571-ff64-489b-b600-425ea94d7544",
+      "name": "Supabase - Log Review Requested",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -24984,
+        -1536
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ (c => JSON.stringify({ p: { request_id: c.requestId, action: 'physician_approved', actor: 'physician', status: 'physician_approved', n8n_execution_id: $execution.id, details: { decision: 'approve' } } }))($('Code - Parse Claude Response').first().json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "93dc61e3-6c3e-41b4-85b9-499beafe6b33",
+      "name": "Supabase - Log Physician Approved",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -23304,
+        -1536
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ((n, cfg) => JSON.stringify({ p: { request_id: n.requestId, action: 'validation_rejected', status: 'rejected_validation', is_mock: String(cfg.AVAILITY_PA_MODE || 'mock').trim().toLowerCase() === 'mock', procedure_code: n.procedure_code || null, diagnosis_codes: n.diagnosis_codes || [], payer_id: n.payer_id || null, physician_npi: n.physician_npi || null, needs_manual_review: true, manual_review_reason: 'Request rejected: missing or invalid fields', n8n_execution_id: $execution.id, details: { missing_or_invalid: ['patient_id', 'encounter_id', 'procedure_code', 'payer_id'].filter(k => !n[k]).concat((n.diagnosis_codes || []).length ? [] : ['diagnosis_codes']).concat(/^[0-9]{10}$/.test(n.physician_npi || '') ? [] : ['physician_npi']) } } }))($('Code - Normalize Request1').first().json, $('Config1').first().json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "994c69cf-04a1-4fd8-8009-91297863b152",
+      "name": "Supabase - Log Validation Rejected",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -27672,
+        -307
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ((c, a) => JSON.stringify({ p: { request_id: c.requestId, action: a === 'reject' ? 'physician_rejected' : 'physician_no_response', actor: a === 'none' ? 'system' : 'physician', status: a === 'reject' ? 'physician_rejected' : 'physician_no_response', needs_manual_review: true, manual_review_reason: a === 'reject' ? 'Physician rejected the AI justification - correct and resubmit manually' : 'Physician did not respond within 24 hours', n8n_execution_id: $execution.id, details: { physician_action: a } } }))($('Code - Parse Claude Response').first().json, String(($('Wait - Physician Decision').first().json.query || {}).action || 'none').toLowerCase()) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "5c885829-0ffa-4e93-ae3a-5a324f487242",
+      "name": "Supabase - Log Not Submitted",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -23304,
+        -1152
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ((c, e) => JSON.stringify({ p: { request_id: c.requestId, action: 'eligibility_failed', status: 'eligibility_failed', needs_manual_review: true, manual_review_reason: 'Eligibility check: ' + e.eligibility, last_error: String(e.message || '').slice(0, 500), n8n_execution_id: $execution.id, details: { eligibility: e.eligibility, polls: e.polls, coverage_status: e.coverageStatus } } }))($('Code - Parse Claude Response').first().json, $('Code - Evaluate Eligibility').last().json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "827fb762-e548-4477-96b6-14b6551e447c",
+      "name": "Supabase - Log Eligibility Failed",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -21624,
+        -115
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ((c, r) => JSON.stringify({ p: { request_id: c.requestId, action: 'payer_decision', status: 'approved', is_mock: r.mock, is_approved: true, auth_number: r.authNumber, auth_effective_date: r.effectiveDate, auth_expiration_date: r.expirationDate, tracking_id: r.trackingId, submitted_at: $now.toUTC().toISO(), next_check_at: null, n8n_execution_id: $execution.id, details: { outcome: 'approved' } } }))($('Code - Parse Claude Response').first().json, $('Code - Normalize PA Response').first().json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "da02c599-8923-4b23-8283-94ee1e45c1a8",
+      "name": "Supabase - Log Approved",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -19944,
+        -1997
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ((c, r, a) => JSON.stringify({ p: { request_id: c.requestId, action: 'payer_decision', status: 'denied', is_mock: r.mock, is_approved: false, denial_code: r.denialCode, denial_reason: r.denialReason, tracking_id: r.trackingId, needs_manual_review: true, manual_review_reason: 'Payer denied - physician to review and send the draft appeal letter', submitted_at: $now.toUTC().toISO(), next_check_at: null, n8n_execution_id: $execution.id, details: { outcome: 'denied', appeal_letter_generated: !!(a.choices && a.choices[0]) } } }))($('Code - Parse Claude Response').first().json, $('Code - Normalize PA Response').first().json, $('OpenAI - Appeal Letter').first().json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "33b0d194-241f-457b-bde5-a7ebda9c51e7",
+      "name": "Supabase - Log Denied",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -19608,
+        -1574
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ((c, r, cfg) => JSON.stringify({ p: { request_id: c.requestId, action: 'payer_decision', status: 'pending', is_mock: r.mock, tracking_id: r.trackingId, submitted_at: $now.toUTC().toISO(), check_count: 0, next_check_at: $now.plus({ hours: Number(cfg.PENDING_POLL_HOURS || 6) }).toUTC().toISO(), n8n_execution_id: $execution.id, details: { outcome: 'pending' } } }))($('Code - Parse Claude Response').first().json, $('Code - Normalize PA Response').first().json, $('Config1').first().json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "b39c188c-fe13-4b2a-a16e-059dc4f52752",
+      "name": "Supabase - Log Pending",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -19944,
+        -1152
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config1').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ((c, r) => JSON.stringify({ p: { request_id: c.requestId, action: 'payer_decision', status: 'error', is_mock: r.mock, needs_manual_review: true, manual_review_reason: 'Submission failed - submit manually in Availity', last_error: String(r.rawError || '').slice(0, 500), next_check_at: null, n8n_execution_id: $execution.id, details: { outcome: 'error' } } }))($('Code - Parse Claude Response').first().json, $('Code - Normalize PA Response').first().json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "43c1a1ea-f955-434d-a725-d48feff58c42",
+      "name": "Supabase - Log Submission Error",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -19944,
+        -691
+      ],
+      "onError": "continueRegularOutput"
+    }
+  ],
+  "connections": {
+    "Epic - Sign JWT": {
+      "main": [
+        [
+          {
+            "node": "Epic - Get Access Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Epic - Get Access Token": {
+      "main": [
+        [
+          {
+            "node": "Epic FHIR - Get Patient1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Epic FHIR - Get Encounter1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Epic FHIR - Get Clinical Notes1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Epic FHIR - Get Coverage1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - Prior Auth Request1": {
+      "main": [
+        [
+          {
+            "node": "Config1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Validate Required Fields1": {
+      "main": [
+        [
+          {
+            "node": "Epic - Sign JWT",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Rejection Email1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config1": {
+      "main": [
+        [
+          {
+            "node": "Code - Normalize Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Normalize Request1": {
+      "main": [
+        [
+          {
+            "node": "IF - Validate Required Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Epic FHIR - Get Patient1": {
+      "main": [
+        [
+          {
+            "node": "Merge - FHIR Responses1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Epic FHIR - Get Encounter1": {
+      "main": [
+        [
+          {
+            "node": "Merge - FHIR Responses1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Epic FHIR - Get Clinical Notes1": {
+      "main": [
+        [
+          {
+            "node": "Merge - FHIR Responses1",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Epic FHIR - Get Coverage1": {
+      "main": [
+        [
+          {
+            "node": "Merge - FHIR Responses1",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge - FHIR Responses1": {
+      "main": [
+        [
+          {
+            "node": "Code - Merge FHIR + Decode Notes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Merge FHIR + Decode Notes1": {
+      "main": [
+        [
+          {
+            "node": "Clinical Extraction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Parse Claude Response": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Case Created",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Physician Review Required": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Review Requested",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Availity - Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clinical Extraction": {
+      "main": [
+        [
+          {
+            "node": "Code - Parse Claude Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Physician Review Alert": {
+      "main": [
+        [
+          {
+            "node": "Wait - Physician Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - Physician Decision": {
+      "main": [
+        [
+          {
+            "node": "IF - Physician Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Physician Approved": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Physician Approved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Not Submitted (Physician)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Availity - Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Code - Evaluate Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Evaluate Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Switch - Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Code - Build PA Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait - 3s",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Eligibility Failure",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Eligibility Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait - 3s": {
+      "main": [
+        [
+          {
+            "node": "Availity - Poll Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Availity - Poll Eligibility": {
+      "main": [
+        [
+          {
+            "node": "Code - Evaluate Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Build PA Request": {
+      "main": [
+        [
+          {
+            "node": "IF - Mock Mode",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Mock Mode": {
+      "main": [
+        [
+          {
+            "node": "Code - Mock Availity PA Response",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Availity - Submit Prior Auth (Live)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Mock Availity PA Response": {
+      "main": [
+        [
+          {
+            "node": "Code - Normalize PA Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Availity - Submit Prior Auth (Live)": {
+      "main": [
+        [
+          {
+            "node": "Code - Normalize PA Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Normalize PA Response": {
+      "main": [
+        [
+          {
+            "node": "Switch - PA Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - PA Outcome": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Approved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "OpenAI - Appeal Letter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Pending",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Submission Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI - Appeal Letter": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Denied + Appeal Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Log Case Created": {
+      "main": [
+        [
+          {
+            "node": "IF - Physician Review Required",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Log Review Requested": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Physician Review Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Log Physician Approved": {
+      "main": [
+        [
+          {
+            "node": "Availity - Eligibility",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Rejection Email1": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Validation Rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Not Submitted (Physician)": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Not Submitted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Eligibility Failure": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Eligibility Failed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Approved": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Approved",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Denied + Appeal Letter": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Denied",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Pending": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Pending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail - Submission Error": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Submission Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Prior Auth Automation – Phase 6 (Supabase audit log)",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false
+}

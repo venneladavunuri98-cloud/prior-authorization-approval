@@ -1,0 +1,851 @@
+{
+  "name": "Prior Auth – Pending Status Poller (Phase 6)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ① Schedule\nRuns every **6 hours** (guide: *schedule status polling every 6 hours*). Activate the workflow to start it.",
+        "height": 250,
+        "width": 300,
+        "color": 1
+      },
+      "id": "4362b08d-0f13-40f9-84b5-18c531587891",
+      "name": "Note - Schedule - Every 6 Hours",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        -270
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ② Manual Trigger\nFor testing: click **Test workflow** to run a check now instead of waiting for the schedule.",
+        "height": 250,
+        "width": 300,
+        "color": 1
+      },
+      "id": "a5ab9a35-09b5-4ceb-af80-3b85b332c549",
+      "name": "Note - Manual Trigger (Testing)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        210
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ③ Config\nSupabase URL, Availity status URL (**confirm in Availity docs**), poll interval, give-up limit (28 checks ≈ 7 days), mock outcome to simulate (`approved` / `denied` / `pending` / `error`) and emails.",
+        "height": 250,
+        "width": 300,
+        "color": 7
+      },
+      "id": "bc02ccf8-c0a5-4f02-8734-1828175618e9",
+      "name": "Note - Config - Poller",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        236,
+        -30
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ④ Get Due Requests\nAsks Supabase for requests with `status = pending` whose `next_check_at` has passed (max 50 per run). Each row becomes one item. No patient data is read.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "b6e909d5-0a42-40a0-a336-4e4d00aa158d",
+      "name": "Note - Supabase - Get Due Pending Auths",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        572,
+        -30
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑤ Anything Due?\nDrops empty results, so the run ends quietly when nothing is waiting.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "c403d232-528e-4075-a430-0704d0565f40",
+      "name": "Note - Filter - Has Due Requests",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        908,
+        -30
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑥ Mock or Live?\nDecided **per request** from `is_mock` saved by the main workflow.\n✅ mock → simulated answer (nothing leaves n8n)\n❌ live → real Availity status call",
+        "height": 250,
+        "width": 300,
+        "color": 7
+      },
+      "id": "c03643a9-0e57-473e-9ea0-1ba89bff3c9f",
+      "name": "Note - IF - Mock Record",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1244,
+        -30
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑦ Mock Status Check\nFakes the payer's answer using `MOCK_POLL_OUTCOME` in Config. Use it to test each branch: approved, denied, still pending, error.",
+        "height": 250,
+        "width": 300,
+        "color": 7
+      },
+      "id": "e177a58e-f754-4950-b935-1c4c8b23be0c",
+      "name": "Note - Code - Mock Status Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        -270
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑧ Availity Status (Live)\n`GET /v2/service-reviews/{trackingId}` returns the payer's current decision. ⚠️ Needs production Service Reviews access - confirm URL and response fields in Availity's docs before go-live.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "8cc60221-a581-405f-956e-ace89ec50430",
+      "name": "Note - Availity - Get Service Review Status",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1580,
+        210
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑨ Evaluate Status\nMaps the reply to approved / denied / pending. A failed call is **check_failed** and is simply retried next run. After 28 checks without a decision → **stale** (a person must follow up).",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "4303cf69-a474-40bc-b64d-aa7cfad5ec58",
+      "name": "Note - Code - Evaluate Status Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1916,
+        -30
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🗄️ ⑩ Log Status Check\nUpdates the request in Supabase and adds a `status_check` event. Still pending → next check in 6 h. Decided → `next_check_at` cleared, so it is never checked again.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "fb95e4ca-d175-4a72-ad00-4884ce4d32ae",
+      "name": "Note - Supabase - Log Status Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2252,
+        -30
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑪ Route Outcome\napproved → care team\ndenied → physician\nstale → billing\nStill pending / check failed → no email, checked again next run.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "97e5994c-1a6f-46d3-9b91-796a4b5ea19e",
+      "name": "Note - Switch - Status Outcome",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2588,
+        -30
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑫ Approved Email\nCare team gets the auth number and validity dates. Only the request ID and procedure code are included, no patient name.",
+        "height": 250,
+        "width": 300,
+        "color": 4
+      },
+      "id": "87b1a2f5-9831-48d4-a15f-d15a095b8540",
+      "name": "Note - Gmail - Approved (Status Check)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2924,
+        -430
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑬ Denied Email\nPhysician gets the denial reason. The request is flagged for manual review (appeal).",
+        "height": 250,
+        "width": 300,
+        "color": 3
+      },
+      "id": "f856a942-098d-4894-9769-675279499e3e",
+      "name": "Note - Gmail - Denied (Status Check)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2924,
+        -30
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## ⑭ Stale Email\nNo decision after 28 checks (≈ 7 days) or the status call keeps failing. Billing follows up by hand; automatic checks stop.",
+        "height": 250,
+        "width": 300,
+        "color": 2
+      },
+      "id": "12a9b84f-d54d-4c56-9272-0d612c52ac06",
+      "name": "Note - Gmail - Stale (Status Check)",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2924,
+        370
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# Prior Auth – Pending Status Poller (Phase 6)\nRe-checks every **pending** prior authorization every 6 hours until the payer decides, then updates Supabase and emails the right person.\n\n**Needs:** the Phase 6 SQL run in Supabase, a *Supabase API* credential on the two 🗄️ nodes, and the main workflow writing `pending` rows.\n\n**Safe by design:** mock requests are never sent to Availity. Live status calls only happen for requests the main workflow submitted in live mode.",
+        "height": 380,
+        "width": 760,
+        "color": 7
+      },
+      "id": "56943c38-c46c-47d2-a0e3-3f7488d2bf45",
+      "name": "Note - Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        -700
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "e8863c23-7eed-4385-8d9a-9ba605ef20ba",
+      "name": "Schedule - Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "e3c9824a-f096-40e8-b4da-5aa407c6d72d",
+      "name": "Manual Trigger (Testing)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "12ecb7c5-ee99-4603-9b6e-f4759f5834f5",
+              "name": "SUPABASE_URL",
+              "value": "https://YOUR-PROJECT-REF.supabase.co",
+              "type": "string"
+            },
+            {
+              "id": "32934119-7328-4d48-bfe6-d6e22d051d8c",
+              "name": "AVAILITY_SERVICE_REVIEW_URL",
+              "value": "https://api.availity.com/availity/v2/service-reviews",
+              "type": "string"
+            },
+            {
+              "id": "0d7b0f22-1cab-4345-9ccb-be4c403db108",
+              "name": "PENDING_POLL_HOURS",
+              "value": "6",
+              "type": "string"
+            },
+            {
+              "id": "f04b7170-9b69-4c4f-98f1-f0623a09f1ea",
+              "name": "MAX_STATUS_CHECKS",
+              "value": "28",
+              "type": "string"
+            },
+            {
+              "id": "82542d73-2077-4f6b-8a51-f30e46f3e413",
+              "name": "MOCK_POLL_OUTCOME",
+              "value": "approved",
+              "type": "string"
+            },
+            {
+              "id": "2502a701-73f1-4568-b615-bb6758803885",
+              "name": "PHYSICIAN_EMAIL",
+              "value": "user@example.com",
+              "type": "string"
+            },
+            {
+              "id": "3ce2e88b-b582-446e-ba9d-41a4355b7dc1",
+              "name": "BILLING_STAFF_EMAIL",
+              "value": "user@example.com",
+              "type": "string"
+            },
+            {
+              "id": "44188ed3-601d-4ce0-9315-15d6d9141acf",
+              "name": "CARE_TEAM_EMAIL",
+              "value": "user@example.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d8400509-abf6-4f49-8446-0a18303e0db4",
+      "name": "Config - Poller",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config - Poller').first().json.SUPABASE_URL }}/rest/v1/prior_auth_requests",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "select",
+              "value": "request_id,tracking_id,is_mock,check_count,procedure_code,payer_id"
+            },
+            {
+              "name": "status",
+              "value": "eq.pending"
+            },
+            {
+              "name": "next_check_at",
+              "value": "=lte.{{ $now.toUTC().toISO() }}"
+            },
+            {
+              "name": "order",
+              "value": "next_check_at.asc"
+            },
+            {
+              "name": "limit",
+              "value": "50"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "545a560d-af7b-467d-a645-e845a6c2bd19",
+      "name": "Supabase - Get Due Pending Auths",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3bff009f-18fe-4cc5-81a4-579942fd0be4",
+              "leftValue": "={{ $json.request_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "099361b9-584e-40cb-bf3c-3fe98b15e1c6",
+      "name": "Filter - Has Due Requests",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1008,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "55d134ac-fd72-4efc-a4ba-bc0ff9f09109",
+              "leftValue": "={{ $json.is_mock }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "5c71c38b-fcda-42f9-a6b5-3916442fc182",
+      "name": "IF - Mock Record",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Simulated payer status for MOCK requests - nothing is sent to Availity or any insurer\nconst outcome = String($('Config - Poller').first().json.MOCK_POLL_OUTCOME || 'approved').toLowerCase();\nconst responses = {\n  approved: { status: 'approved', authorizationNumber: 'MOCK-A' + String(Date.now()).slice(-6),\n              certificationEffectiveDate: $now.toFormat('yyyy-MM-dd'),\n              certificationExpirationDate: $now.plus({ days: 90 }).toFormat('yyyy-MM-dd') },\n  denied:   { status: 'denied', denialReasonCode: 'NMN',\n              denialReason: 'Not medically necessary - insufficient evidence of failed conservative therapy' },\n  pending:  { status: 'pending', message: 'Still pended for medical review' },\n  error:    { error: 'Mock payer timeout' }\n};\nreturn { json: { ...(responses[outcome] || responses.approved), mock: true } };"
+      },
+      "id": "d7d9178b-acc7-4d99-934d-be6e3619bb31",
+      "name": "Code - Mock Status Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Config - Poller').first().json.AVAILITY_SERVICE_REVIEW_URL }}/{{ encodeURIComponent($json.tracking_id || '') }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "e84de684-a5fc-4844-b766-a0f7e091e04a",
+      "name": "Availity - Get Service Review Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        480
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "oAuth2Api (configure in n8n)"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Turn the payer's status reply into one outcome per request\nconst rec = $('Filter - Has Due Requests').item.json;\nconst cfg = $('Config - Poller').first().json;\nconst r = $json || {};\nconst raw = String(r.status || r.authorizationStatus || r.certificationStatus || r.statusCode || '').toLowerCase();\n\nlet observed = 'check_failed';   // could not read a decision this time\nif (['approved', 'a1', 'certified'].includes(raw)) observed = 'approved';\nelse if (['denied', 'a3', 'not_certified', 'rejected'].includes(raw)) observed = 'denied';\nelse if (['pending', 'a4', 'p', 'pended', 'in process', '0'].includes(raw)) observed = 'pending';\n\nconst checks = Number(rec.check_count || 0) + 1;\nconst maxChecks = Number(cfg.MAX_STATUS_CHECKS || 28);\nconst waiting = observed === 'pending' || observed === 'check_failed';\nconst paStatus = waiting && checks >= maxChecks ? 'stale' : observed;\nconst hours = Number(cfg.PENDING_POLL_HOURS || 6);\n\nconst errText = v => (v && typeof v === 'object') ? (v.message || JSON.stringify(v)) : v;\nlet problem = null;\nif (observed === 'check_failed') {\n  problem = String(errText(r.error) || r.userMessage || ('Unrecognised status: ' + (raw || 'none'))).slice(0, 500);\n}\nif (paStatus === 'stale' && !problem) problem = 'Still pending after ' + checks + ' checks';\n\nreturn { json: {\n  request_id: rec.request_id,\n  tracking_id: rec.tracking_id || null,\n  procedure_code: rec.procedure_code || null,\n  mock: rec.is_mock === true,\n  paStatus,                       // approved | denied | pending | check_failed | stale\n  checks,\n  nextCheckAt: paStatus === 'pending' || paStatus === 'check_failed' ? $now.plus({ hours }).toUTC().toISO() : null,\n  authNumber: r.authorizationNumber || r.authNumber || null,\n  effectiveDate: r.certificationEffectiveDate || null,\n  expirationDate: r.certificationExpirationDate || null,\n  denialReason: r.denialReason || r.reason || null,\n  denialCode: r.denialReasonCode || r.reasonCode || null,\n  problem\n} };"
+      },
+      "id": "251fdc7a-c3a0-46f4-937a-325818e90d7d",
+      "name": "Code - Evaluate Status Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config - Poller').first().json.SUPABASE_URL }}/rest/v1/rpc/log_prior_auth",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ (x => JSON.stringify({ p: { request_id: x.request_id, action: 'status_check', actor: 'n8n', status: ({ approved: 'approved', denied: 'denied', pending: 'pending', check_failed: 'pending', stale: 'stale' })[x.paStatus], check_count: x.checks, last_checked_at: $now.toUTC().toISO(), next_check_at: x.nextCheckAt, is_approved: x.paStatus === 'approved' ? true : (x.paStatus === 'denied' ? false : null), auth_number: x.authNumber, auth_effective_date: x.effectiveDate, auth_expiration_date: x.expirationDate, denial_code: x.denialCode, denial_reason: x.denialReason, needs_manual_review: x.paStatus === 'denied' || x.paStatus === 'stale' ? true : null, manual_review_reason: x.paStatus === 'denied' ? 'Payer denied (found by status check) - prepare an appeal' : (x.paStatus === 'stale' ? 'No payer decision after ' + x.checks + ' checks - follow up with the payer' : null), last_error: x.problem, n8n_execution_id: $execution.id, details: { outcome: x.paStatus, mock: x.mock } } }))($json) }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "175eaf03-c28c-4401-a78a-603a3ed62871",
+      "name": "Supabase - Log Status Check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2352,
+        240
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "969be692-b327-46af-8c2e-c00b7aa4bc80",
+                    "leftValue": "={{ $('Code - Evaluate Status Check').item.json.paStatus }}",
+                    "rightValue": "approved",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "approved"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ff161920-ca3b-408a-be37-e1b2fb41db79",
+                    "leftValue": "={{ $('Code - Evaluate Status Check').item.json.paStatus }}",
+                    "rightValue": "denied",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "denied"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a6672941-a317-4f5c-b87e-0e406c664250",
+                    "leftValue": "={{ $('Code - Evaluate Status Check').item.json.paStatus }}",
+                    "rightValue": "stale",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "stale"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "bd50b166-c11b-421f-8f16-86ea776b264a",
+      "name": "Switch - Status Outcome",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2688,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config - Poller').first().json.CARE_TEAM_EMAIL }}",
+        "subject": "={{ $('Code - Evaluate Status Check').item.json.mock ? '[TEST] ' : '' }}Prior Auth APPROVED - {{ $('Code - Evaluate Status Check').item.json.request_id }}",
+        "message": "=<p><strong>Prior authorization approved</strong> (found by the automatic status check)</p><p>Request ID: {{ $('Code - Evaluate Status Check').item.json.request_id }}<br>Authorization #: <strong>{{ $('Code - Evaluate Status Check').item.json.authNumber }}</strong><br>Valid: {{ $('Code - Evaluate Status Check').item.json.effectiveDate }} to {{ $('Code - Evaluate Status Check').item.json.expirationDate }}<br>Procedure: {{ $('Code - Evaluate Status Check').item.json.procedure_code }}</p><p>Patient details are in Epic / the audit log.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "62874390-f83a-424b-93bc-f931d3c97ade",
+      "name": "Gmail - Approved (Status Check)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3024,
+        -160
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config - Poller').first().json.PHYSICIAN_EMAIL }}",
+        "subject": "={{ $('Code - Evaluate Status Check').item.json.mock ? '[TEST] ' : '' }}Prior Auth DENIED - {{ $('Code - Evaluate Status Check').item.json.request_id }}",
+        "message": "=<p><strong>Prior authorization denied</strong> (found by the automatic status check)</p><p>Request ID: {{ $('Code - Evaluate Status Check').item.json.request_id }}<br>Procedure: {{ $('Code - Evaluate Status Check').item.json.procedure_code }}<br>Reason: {{ $('Code - Evaluate Status Check').item.json.denialReason || 'not stated' }} ({{ $('Code - Evaluate Status Check').item.json.denialCode || 'no code' }})</p><p>The request is in the manual review queue. Please prepare an appeal.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "34993e4c-21b5-4975-aafc-11b153262f24",
+      "name": "Gmail - Denied (Status Check)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3024,
+        240
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Config - Poller').first().json.BILLING_STAFF_EMAIL }}",
+        "subject": "={{ $('Code - Evaluate Status Check').item.json.mock ? '[TEST] ' : '' }}Prior Auth needs follow-up - {{ $('Code - Evaluate Status Check').item.json.request_id }}",
+        "message": "=<p>Prior authorization <strong>{{ $('Code - Evaluate Status Check').item.json.request_id }}</strong> still has no payer decision.</p><p>Checks made: {{ $('Code - Evaluate Status Check').item.json.checks }}<br>Tracking ID: {{ $('Code - Evaluate Status Check').item.json.tracking_id }}<br>Last problem: {{ $('Code - Evaluate Status Check').item.json.problem }}</p><p>Automatic checks have stopped. Please follow up with the payer in Availity.</p>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "f766f9e9-d4fa-4a78-9dd1-35ec890733bf",
+      "name": "Gmail - Stale (Status Check)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3024,
+        640
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "REPLACE_WITH_YOUR_CREDENTIAL",
+          "name": "gmailOAuth2 (configure in n8n)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Schedule - Every 6 Hours": {
+      "main": [
+        [
+          {
+            "node": "Config - Poller",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manual Trigger (Testing)": {
+      "main": [
+        [
+          {
+            "node": "Config - Poller",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config - Poller": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Get Due Pending Auths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Get Due Pending Auths": {
+      "main": [
+        [
+          {
+            "node": "Filter - Has Due Requests",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter - Has Due Requests": {
+      "main": [
+        [
+          {
+            "node": "IF - Mock Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Mock Record": {
+      "main": [
+        [
+          {
+            "node": "Code - Mock Status Check",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Availity - Get Service Review Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Mock Status Check": {
+      "main": [
+        [
+          {
+            "node": "Code - Evaluate Status Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Availity - Get Service Review Status": {
+      "main": [
+        [
+          {
+            "node": "Code - Evaluate Status Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Evaluate Status Check": {
+      "main": [
+        [
+          {
+            "node": "Supabase - Log Status Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase - Log Status Check": {
+      "main": [
+        [
+          {
+            "node": "Switch - Status Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch - Status Outcome": {
+      "main": [
+        [
+          {
+            "node": "Gmail - Approved (Status Check)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Denied (Status Check)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Gmail - Stale (Status Check)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {},
+  "active": false
+}
