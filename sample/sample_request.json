@@ -1,15 +1,13 @@
 {
-  "_note": "Entirely fictional test data. Never use real patient data.",
-  "request_id": "11111111-2222-3333-4444-555555555555",
-  "status": "awaiting_physician",
-  "requesting_physician_name": "Dr. Test Physician",
-  "patient_id": "TEST-PATIENT-001",
-  "procedure_code": "72148",
-  "diagnosis_codes": ["M54.16"],
-  "physician_npi": "0000000000",
-  "payer_id": "TEST-PAYER",
-  "payer_name": "Sandbox Health Plan",
+  "_note": "Fictional test request. patient_id is a public Epic FHIR sandbox test patient, not a real person. Never send real patient data to a test workflow.",
+  "encounter_id": "test-encounter-1",
+  "procedure_code": "27447",
+  "payer_id": "62308",
+  "diagnosis_codes": [
+    "M17.11"
+  ],
   "payer_member_id": "TEST-MEMBER-001",
-  "urgency_level": "routine",
-  "clinical_extraction": "Fictional: 8 weeks of lumbar radicular pain unresponsive to physical therapy and NSAIDs."
+  "physician_npi": "0000000000",
+  "patient_id": "erXuFYUfucBZaryVksYEcMg3",
+  "clinical_note": "Orthopedic Surgery Follow-up. 38-year-old female with right knee pain for 3 years, worsening over the last 12 months. Pain 8/10, limits walking to under 1 block, difficulty with stairs; wakes at night from pain. Conservative care: 12 weeks of supervised physical therapy (Jan-Apr 2026) without lasting benefit; naproxen 500 mg BID for 6 months, stopped due to GI upset; two intra-articular corticosteroid injections (Feb 2026, Jun 2026) with less than 4 weeks of relief each; hyaluronic acid series Aug 2026 with no improvement. Exam: varus deformity, effusion, medial joint line tenderness, ROM 5-95 degrees, antalgic gait. Weight-bearing X-ray right knee (Sep 2026): Kellgren-Lawrence grade 4, bone-on-bone medial compartment, osteophytes, subchondral sclerosis. BMI 29. No active infection. Assessment: severe primary osteoarthritis right knee (M17.11) refractory to conservative management. Plan: right total knee arthroplasty (CPT 27447). Patient counseled and consents."
 }
